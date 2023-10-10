@@ -2,8 +2,8 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 import sys
 import json
-from config import GlobalConfig
-from interface.window import MainWindow
+from util.config import GlobalConfig
+from presentation.view.window import MainWindow
 
 
 if __name__ == "__main__":

@@ -3,5 +3,10 @@
         "Weight":600,
         "Height":400,
         "Background":"rgb(247,247,247)"
+    },
+    "Panel":{
+        "Background":"White",
+        "Border":"1px solid lightgray",
+        "BorderRadius":"20px"
     }
 }

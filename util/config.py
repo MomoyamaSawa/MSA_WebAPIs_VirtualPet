@@ -1,4 +1,4 @@
-from tools import singleton
+from common.singleton import singleton
 
 @singleton
 class GlobalConfig:
