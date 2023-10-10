@@ -19,5 +19,6 @@
                 "output":"JSON"
             }
         }
-    }
+    },
+    "Database":"sqlite:///data.db"
 }

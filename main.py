@@ -8,12 +8,10 @@ from presentation.view.window import MainWindow
 
 if __name__ == "__main__":
 
-    # 读取配置文件，初始化一个全局配置单例对象
-
+    # 这个配置的初始化要在很多操作之前，比如数据库的初始化就要用到全局配置
     with open("config.json") as file:
         file_content = file.read()
         configData = json.loads(file_content)
-
     config = GlobalConfig(**configData)
 
     app = QApplication(sys.argv)

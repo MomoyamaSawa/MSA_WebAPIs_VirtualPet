@@ -8,7 +8,7 @@
             "name": "Python: test",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "D:/Study/微服务/MSA_VirtualPet/test.py",
             "console": "integratedTerminal",
             "justMyCode": true
         },
