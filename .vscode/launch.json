@@ -5,7 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: 当前项目",
+            "name": "Python: test",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Python: main",
             "type": "python",
             "request": "launch",
             "program": "D:/Study/微服务/MSA_VirtualPet/main.py",

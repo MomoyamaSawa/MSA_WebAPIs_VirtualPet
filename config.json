@@ -8,5 +8,16 @@
         "Background":"White",
         "Border":"1px solid lightgray",
         "BorderRadius":"20px"
+    },
+    "WebAPI":{
+        "Weather":{
+            "URL":"https://restapi.amap.com/v3/weather/weatherInfo",
+            "Params":{
+                "key":"db0aa153c808a319ff5146ac3116cef1",
+                "city":"310114",
+                "extensions":"base",
+                "output":"JSON"
+            }
+        }
     }
 }
