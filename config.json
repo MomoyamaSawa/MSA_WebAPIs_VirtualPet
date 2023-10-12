@@ -10,7 +10,7 @@
         "BorderRadius":"20px"
     },
     "WebAPI":{
-        "Weather":{
+        "GetWeather":{
             "URL":"https://restapi.amap.com/v3/weather/weatherInfo",
             "Params":{
                 "key":"db0aa153c808a319ff5146ac3116cef1",
@@ -18,7 +18,29 @@
                 "extensions":"base",
                 "output":"JSON"
             }
+        },
+        "Music":{
+            "Search":{
+                "URL":"https://autumnfish.cn/cloudsearch",
+                "Params":{
+                    "limit":1,
+                    "type":1
+                }
+            },
+            "Get":{
+                "URL":"https://autumnfish.cn/song/url/v1",
+                "Params":{
+                    "level":"standard"
+                }
+            }
+        },
+        "Picture":{
+            "URL":"https://t.mwm.moe/pc/"
+        },
+        "Sentance":{
+            "URL":"https://v1.hitokoto.cn/"
         }
     },
-    "Database":"sqlite:///data.db"
+    "Database":"sqlite:///data.db",
+    "Storage":"./storage/"
 }

@@ -1,3 +1,5 @@
+from io import BytesIO
+
 class WeatherDto():
     """
     天气信息的dto
@@ -25,3 +27,27 @@ class TimeDto():
         self.weekDay = weekDay
 
 
+class MusicDataDto():
+    """
+    音乐数据的dto
+    """
+    def __init__(self,name,type,content):
+        self.name = name
+        self.type = type
+        self.content:BytesIO = content
+
+class PictureDataDto():
+    """
+    图片数据的dto
+    """
+    def __init__(self,content):
+        self.content:BytesIO = content
+
+class SentanceDataDto():
+    """
+    句子数据的dto
+    """
+    def __init__(self,where,who,content):
+        self.where = where
+        self.who = who
+        self.content = content
