@@ -1,6 +1,6 @@
 from util.config import GlobalConfig
 from datetime import datetime
-from do.dto.APIDto import TimeDto,WeatherDto,MusicDataDto,PictureDataDto,SentanceDataDto
+from do.dto.APIDto import *
 import requests,io
 from exception import WebAPIException
 
@@ -99,6 +99,7 @@ class APIService:
     def getSearchImages(self,keyword):
         """
         获得搜索图片
+        BUG 还未写好
         """
         url = self.config.WebAPI["Image"]["Search"]["URL"]
         params = self.config.WebAPI["Image"]["Search"]["Params"]
@@ -134,3 +135,19 @@ class APIService:
             results.append(result)
 
         return results
+
+    def getHistoryOnToday(self) -> HistoryOnTodayDto:
+        """
+        获得历史上的今天
+        """
+        url = self.config.WebAPI["History"]["URL"]
+        response = requests.get(url)
+        if (response.status_code != 200):
+            raise WebAPIException(response.status_code, response.text)
+        data = response.json()
+        day = data['day']
+        contents:list[HistoryOnTodayItem] = []
+        for item in data['result']:
+            contents.append(HistoryOnTodayItem(item["day"],item["itle"]))
+
+        return HistoryOnTodayDto(day,contents)

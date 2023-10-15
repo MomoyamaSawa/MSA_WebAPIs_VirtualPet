@@ -51,3 +51,19 @@ class SentanceDataDto():
         self.where = where
         self.who = who
         self.content = content
+
+class HistoryOnTodayItem():
+    """
+    历史上的今天的item
+    """
+    def __init__(self,day,content):
+        self.day = day
+        self.content = content
+
+class HistoryOnTodayDto():
+    """
+    历史上的今天的dto
+    """
+    def __init__(self,day,contents:list[HistoryOnTodayItem]):
+        self.day = day
+        self.contents = contents

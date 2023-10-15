@@ -48,6 +48,9 @@
                 },
                 "Num":5
             }
+        },
+        "History":{
+            "URL":"https://api.oick.cn/lishi/api.php"
         }
     },
     "Database":"sqlite:///data.db",
