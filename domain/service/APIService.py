@@ -3,6 +3,7 @@ from datetime import datetime
 from do.dto.APIDto import *
 import requests,io,httpx
 from exception import WebAPIException
+from common.LanguageType import LanguageTypeEnum
 
 class APIService:
     """
@@ -177,3 +178,16 @@ class APIService:
         response = requests.get(url, params=params)
         data = response.json()
         return RandomMusicDto(data['id'],data['title'],data['artist'],data['cover'])
+
+    def getTr(self,msg,to:LanguageTypeEnum) -> TrDto:
+        """"
+        翻译　
+        INFO　要求翻译文本大于2个字符，在APP里写一下吧
+        """
+        url = self.config.WebAPI["Translation"]["URL"]
+        params = self.config.WebAPI["Translation"]["Params"]
+        params['msg'] = msg
+        params['to'] = to.value
+        response = requests.get(url, params=params)
+        data = response.json()
+        return TrDto(data["msg"])

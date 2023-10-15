@@ -65,6 +65,12 @@
                 "model": "anime",
                 "ai_detect": 0
             }
+        },
+        "Translation":{
+            "URL":"https://xiaoapi.cn/API/zs_fy.php",
+            "Params":{
+                "type":"youdao"
+            }
         }
     },
     "Database":"sqlite:///data.db",

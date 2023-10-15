@@ -85,3 +85,10 @@ class RandomMusicDto():
         self.title = title
         self.author = author
         self.cover = cover
+
+class TrDto():
+    """
+    翻译的dto
+    """
+    def __init__(self,msg):
+        self.msg = msg
