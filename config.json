@@ -51,6 +51,14 @@
         },
         "History":{
             "URL":"https://api.oick.cn/lishi/api.php"
+        },
+        "InfoFromImage":{
+            "URL":"https://aiapiv2.animedb.cn/ai/api/detect",
+            "Params":{
+                "force_one": 0,
+                "model": "anime",
+                "ai_detect": 0
+            }
         }
     },
     "Database":"sqlite:///data.db",

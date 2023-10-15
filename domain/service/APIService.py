@@ -1,7 +1,7 @@
 from util.config import GlobalConfig
 from datetime import datetime
 from do.dto.APIDto import *
-import requests,io
+import requests,io,httpx
 from exception import WebAPIException
 
 class APIService:
@@ -86,7 +86,7 @@ class APIService:
         # # 显示图像
         # image.show()
 
-    def getSingleSentance(self):
+    def getSingleSentance(self) -> SentanceDataDto:
         """
         获得随机的语句
         TODO 之后可以扩充一下参数。我看那个参数蛮多的
@@ -151,3 +151,19 @@ class APIService:
             contents.append(HistoryOnTodayItem(item["day"],item["itle"]))
 
         return HistoryOnTodayDto(day,contents)
+
+    async def getInfoFromImage(self,filePath) -> InfoFromImageDto:
+        """
+        TODO 图像识别出动漫，之后加一点识别是否为AI图，还有识别的是动漫还是gal的参数进去吧
+        """
+        url = self.config.WebAPI["InfoFromImage"]["URL"]
+        files = {'image': open(filePath, 'rb')}
+        params = self.config.WebAPI["InfoFromImage"]["Params"]
+        async with httpx.AsyncClient() as client:
+            # only httpx 不知道为什么用request防火墙会拦
+            response = await client.post(url, files=files, params=params)
+            response.raise_for_status()
+            data = response.json()
+        name = data["data"][0]['char'][0]['name']
+        wrok = data["data"][0]['char'][0]['cartoonname']
+        return InfoFromImageDto(name,wrok)
