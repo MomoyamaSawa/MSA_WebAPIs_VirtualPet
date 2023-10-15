@@ -191,3 +191,30 @@ class APIService:
         response = requests.get(url, params=params)
         data = response.json()
         return TrDto(data["msg"])
+
+    def getWikiSearch(self,keyword):
+        """
+        维基百科搜索
+        """
+        url = self.config.WebAPI["Wiki"]["URL"]
+        params = self.config.WebAPI["Wiki"]["Params"]
+        params.update(self.config.WebAPI["Wiki"]["SearchParams"])
+        params['lsrsearch'] = keyword
+        response = requests.get(url, params=params)
+        data = response.json()
+        results = []
+        for item in data['query']['search']:
+            results.append(WikiSearchItem(item['title'],item["pageid"],item['snippet']))
+        return WikiSearchDto(results)
+
+    def getWikiDetail(self,id):
+        """
+        维基百科条目
+        """
+        url = self.config.WebAPI["Wiki"]["URL"]
+        params = self.config.WebAPI["Wiki"]["Params"]
+        params.update(self.config.WebAPI["Wiki"]["GetParams"])
+        params['pageids'] = id
+        response = requests.get(url, params=params)
+        data = response.json()
+        return WikiDetailDto(data['query']['pages'][id]['title'],data['query']['pages'][id]['extract'])

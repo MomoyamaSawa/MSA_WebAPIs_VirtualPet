@@ -71,6 +71,23 @@
             "Params":{
                 "type":"youdao"
             }
+        },
+        "Wiki":{
+            "URL":"https://zh.wikipedia.org/w/api.php?",
+            "WikiURL":"https://zh.wikipedia.org/wiki",
+            "Params":{
+                "action":"query",
+                "format":"json"
+            },
+            "SearchParams":{
+                "list":"search",
+                "srlimit":5
+            },
+            "GetParams":{
+                "prop":"extracts",
+                "exintro":"",
+                "explaintext":""
+            }
         }
     },
     "Database":"sqlite:///data.db",

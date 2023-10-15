@@ -92,3 +92,27 @@ class TrDto():
     """
     def __init__(self,msg):
         self.msg = msg
+
+class WikiSearchItem():
+    """
+    wiki模糊搜索的item
+    """
+    def __init__(self,title,pageid,snippet):
+        self.title = title
+        self.pageid = pageid
+        self.snippet = snippet
+
+class WikiSearchDto():
+    """
+    wiki模糊搜索的dto
+    """
+    def __init__(self,contents:list[WikiSearchItem]):
+        self.contents = contents
+
+class WikiDetailDto():
+    """
+    wiki详情的dto
+    """
+    def __init__(self,title,content):
+        self.title = title
+        self.content = content
