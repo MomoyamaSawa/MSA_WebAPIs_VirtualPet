@@ -33,7 +33,7 @@ class APIService:
     def getMusicData(self,keyword) -> MusicDataDto:
         """
         取得一首歌的下载 url
-        TODO 暂未测试无版权的时候是否可用
+        TODO 暂未测试无版权的时候是否可用，这边之后拆一下
         """
         searchURL = self.config.WebAPI["Music"]["Search"]["URL"]
         searchParams = self.config.WebAPI["Music"]["Search"]["Params"]
@@ -167,3 +167,13 @@ class APIService:
         name = data["data"][0]['char'][0]['name']
         wrok = data["data"][0]['char'][0]['cartoonname']
         return InfoFromImageDto(name,wrok)
+
+    def getRandomMusic(self):
+        """
+        随机音乐，然后调用播放的接口
+        """
+        url = self.config.WebAPI["Music"]["RandomMusic"]["URL"]
+        params = self.config.WebAPI["Music"]["RandomMusic"]["Params"]
+        response = requests.get(url, params=params)
+        data = response.json()
+        return RandomMusicDto(data['id'],data['title'],data['artist'],data['cover'])

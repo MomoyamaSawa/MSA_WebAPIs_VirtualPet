@@ -67,3 +67,21 @@ class HistoryOnTodayDto():
     def __init__(self,day,contents:list[HistoryOnTodayItem]):
         self.day = day
         self.contents = contents
+
+class InfoFromImageDto():
+    """
+    从图片中提取的信息的dto
+    """
+    def __init__(self,name,work):
+        self.name = name
+        self.work = work
+
+class RandomMusicDto():
+    """
+    随机音乐的dto
+    """
+    def __init__(self,id,title,author,cover):
+        self.id = id
+        self.title = title
+        self.author = author
+        self.cover = cover

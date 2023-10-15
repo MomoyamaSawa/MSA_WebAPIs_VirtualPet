@@ -32,6 +32,12 @@
                 "Params":{
                     "level":"standard"
                 }
+            },
+            "Random":{
+                "URL":"https://api.paugram.com/acgm/",
+                "Params":{
+                    "list":1
+                }
             }
         },
         "Picture":{
