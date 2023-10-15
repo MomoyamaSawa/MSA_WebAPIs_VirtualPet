@@ -1,7 +1,7 @@
 from util.config import GlobalConfig
 from datetime import datetime
 from do.dto.APIDto import *
-import requests,io,httpx
+import requests,io,httpx,json
 from exception import WebAPIException
 from common.LanguageType import LanguageTypeEnum
 
@@ -218,3 +218,18 @@ class APIService:
         response = requests.get(url, params=params)
         data = response.json()
         return WikiDetailDto(data['query']['pages'][id]['title'],data['query']['pages'][id]['extract'])
+
+    def getGPT(self,msg) -> GPTAnsDto :
+        """
+        GPT-3.5
+        TODO 之后多研究一下参数，还有从数据库里读出之前的对话做记忆化
+        """
+        url = self.config.WebAPI["GPT"]["URL"]
+        params = self.config.WebAPI["GPT"]["Data"]
+        params['messages'] = [{}]
+        params['messages'][0]['content'] = msg
+        params['messages'][0]['role'] = "user"
+        headers = self.config.WebAPI["GPT"]["Headers"]
+        response = requests.get(url, data=json.dumps(params),headers=headers)
+        data = response.json()
+        return GPTAnsDto(data['choices'][0]['message']['content'])

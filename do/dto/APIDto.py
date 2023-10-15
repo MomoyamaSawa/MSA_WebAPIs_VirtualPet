@@ -116,3 +116,10 @@ class WikiDetailDto():
     def __init__(self,title,content):
         self.title = title
         self.content = content
+
+class GPTAnsDto():
+    """
+    GPT回答的dto
+    """
+    def __init__(self,ans):
+        self.ans = ans

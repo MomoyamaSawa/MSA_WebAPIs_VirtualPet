@@ -88,6 +88,16 @@
                 "exintro":"",
                 "explaintext":""
             }
+        },
+        "GPT":{
+            "Headers":{
+                "Content-Type":"application/json",
+                "Authorization":"Bearer sk-6HEru99826ehc6aLBAoObeB2O1Uz84FKiMzibcKaMYgHU6Hp"
+            },
+            "URL":"https://api.chatanywhere.com.cn/v1/chat/completions",
+            "Data":{
+                "model":"gpt-3.5-turbo"
+            }
         }
     },
     "Database":"sqlite:///data.db",
