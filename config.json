@@ -39,6 +39,15 @@
         },
         "Sentance":{
             "URL":"https://v1.hitokoto.cn/"
+        },
+        "Image":{
+            "Search":{
+                "URL":"https://api.acgmx.com/public/search",
+                "Params":{
+                    "offset":30
+                },
+                "Num":5
+            }
         }
     },
     "Database":"sqlite:///data.db",

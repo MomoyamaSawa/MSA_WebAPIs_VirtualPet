@@ -96,4 +96,41 @@ class APIService:
         data = response.json()
         return SentanceDataDto(data['from'], data['from_who'], data['hitokoto'])
 
+    def getSearchImages(self,keyword):
+        """
+        获得搜索图片
+        """
+        url = self.config.WebAPI["Image"]["Search"]["URL"]
+        params = self.config.WebAPI["Image"]["Search"]["Params"]
+        params['q'] = keyword
+        response = requests.get(url, params=params)
+        data = response.json()
+        data = data.illusts
+        results = []
 
+        # 遍历前五个元素
+        num = self.config.WebAPI["Image"]["Search"]["Num"]
+        for item in data[:num]:
+            title = item["title"]
+            username = item["user"]["name"]
+            item_id = item["id"]
+
+            if "meta_single_page" in item and "original_image_url" in item["meta_single_page"]:
+                image_url = item["meta_single_page"]["original_image_url"]
+            elif "meta_pages" in item and item["meta_pages"]:
+                image_url = item["meta_pages"][0]
+            else:
+                image_url = None
+
+            # 创建包含所需字段的字典
+            result = {
+                "title": title,
+                "username": username,
+                "id": item_id,
+                "image_url": image_url
+            }
+
+            # 将字典添加到结果列表中
+            results.append(result)
+
+        return results
