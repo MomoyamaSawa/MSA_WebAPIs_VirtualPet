@@ -4,6 +4,9 @@ from do.dto.APIDto import *
 import requests,io,httpx,json
 from exception import WebAPIException
 from common.LanguageType import LanguageTypeEnum
+from common.AIDrawType import AIDrawStyleEnum,AIDrawRadioEnum
+from common.RankingImgType import RankingImgType,RankingImgMode
+from datetime import datetime,timedelta
 
 class APIService:
     """
@@ -97,45 +100,43 @@ class APIService:
         data = response.json()
         return SentanceDataDto(data['from'], data['from_who'], data['hitokoto'])
 
-    def getSearchImages(self,keyword):
+    def getSearchImages(self,type:RankingImgType,mode:RankingImgMode):
         """
         获得搜索图片
         BUG 还未写好
         """
-        url = self.config.WebAPI["Image"]["Search"]["URL"]
-        params = self.config.WebAPI["Image"]["Search"]["Params"]
-        params['q'] = keyword
+        url = self.config.WebAPI["Image"]["Ranking"]["URL"]
+        params = self.config.WebAPI["Image"]["Ranking"]["Params"]
+        params['ranking_type'] = type.value
+        params['mode'] = mode.value
+        current_date = datetime.now()
+        previous_date = current_date - timedelta(days=2)
+        formatted_date = previous_date.strftime("%Y-%m-%d")
+        params['date'] = formatted_date
         response = requests.get(url, params=params)
         data = response.json()
-        data = data.illusts
+        nextPage = data["next_url"]
+        # TODO 这边他一次最少返回30个好象，要处理一下
+        num =  self.config.WebAPI["Image"]["Ranking"]["Params"]["per_page"]
+        data = data["illusts"]
         results = []
 
-        # 遍历前五个元素
-        num = self.config.WebAPI["Image"]["Search"]["Num"]
+        # 遍历前num个元素
         for item in data[:num]:
             title = item["title"]
             username = item["user"]["name"]
-            item_id = item["id"]
+            id = item["id"]
+            caption = item["caption"]
 
-            if "meta_single_page" in item and "original_image_url" in item["meta_single_page"]:
-                image_url = item["meta_single_page"]["original_image_url"]
-            elif "meta_pages" in item and item["meta_pages"]:
-                image_url = item["meta_pages"][0]
-            else:
-                image_url = None
+            imageURL = item["image_urls"]["large"]
 
             # 创建包含所需字段的字典
-            result = {
-                "title": title,
-                "username": username,
-                "id": item_id,
-                "image_url": image_url
-            }
+            result = SearchImagesItem(id,title,username,imageURL,caption)
 
             # 将字典添加到结果列表中
             results.append(result)
 
-        return results
+        return SearchImagesDto(results,nextPage)
 
     def getHistoryOnToday(self) -> HistoryOnTodayDto:
         """
@@ -233,3 +234,16 @@ class APIService:
         response = requests.get(url, data=json.dumps(params),headers=headers)
         data = response.json()
         return GPTAnsDto(data['choices'][0]['message']['content'])
+
+    def getAIDraw(self,txt,style: AIDrawStyleEnum,radio: AIDrawRadioEnum) -> AIDrawDto:
+        """
+        AI画画
+        """
+        url = self.config.WebAPI["AIDraw"]["URL"]
+        params = self.config.WebAPI["AIDraw"]["Params"]
+        params['imgTxt'] = txt
+        params['style'] = style.value
+        params['radio'] = radio.value
+        response = requests.get(url, params=params)
+        data = response.json()
+        return AIDrawDto(data['data']['result']['img'])

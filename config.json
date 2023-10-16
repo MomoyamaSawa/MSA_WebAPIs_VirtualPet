@@ -47,12 +47,18 @@
             "URL":"https://v1.hitokoto.cn/"
         },
         "Image":{
-            "Search":{
-                "URL":"https://api.acgmx.com/public/search",
+            "Ranking":{
+                "URL":"https://api.acgmx.com/public/ranking",
                 "Params":{
-                    "offset":30
-                },
-                "Num":5
+                    "page":1,
+                    "per_page":5
+                }
+            },
+            "Get":{
+                "URL":"https://api.acgmx.com/illusts/urlLook",
+                "Params":{
+                    "cache":"false"
+                }
             }
         },
         "History":{
@@ -97,6 +103,13 @@
             "URL":"https://api.chatanywhere.com.cn/v1/chat/completions",
             "Data":{
                 "model":"gpt-3.5-turbo"
+            }
+        },
+        "AIDraw":{
+            "URL":"https://luckycola.com.cn/aiImg/getAiImage",
+            "Params":{
+                "appKey":"652bf8c6e95421d67849ab56",
+                "uid":"7SZQJJ1697380550326EWYF3yfxGI"
             }
         }
     },

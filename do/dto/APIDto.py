@@ -123,3 +123,29 @@ class GPTAnsDto():
     """
     def __init__(self,ans):
         self.ans = ans
+
+class SearchImagesItem():
+    """
+    搜索图片的item
+    """
+    def __init__(self,id,title,username,url,caption):
+        self.title = title
+        self.username = username
+        self.id= id
+        self.imgURL = url
+        self.caption = caption
+
+class SearchImagesDto():
+    """
+    搜索图片的dto
+    """
+    def __init__(self,contents:list[SearchImagesItem],nextPageURL):
+        self.contents = contents
+        self.nextPageURL = nextPageURL
+
+class AIDrawDto():
+    """
+    AI画画的dto
+    """
+    def __init__(self,url):
+        self.url = url
