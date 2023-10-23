@@ -9,6 +9,7 @@ from application.PetApp import PetApplication
 from presentation.component.customMsgBox import *
 from presentation.component.dialogBox import CharacterDialogBox
 import shutil,asyncio
+from util.live2D import *
 
 class MainWindow(QWidget):
     """
@@ -28,19 +29,56 @@ class MainWindow(QWidget):
         self.player.setAudioOutput(self.audioOutput)
         self.dialog = CharacterDialogBox(GlobalConfig().PetName)
         self.dialog.hide()
+        self.w = QWidget()
+        self.dll = None
+        self.once = False
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.updateFrom)
+        self.timer.start(100)  # 每100毫秒更新一次位置
 
         # 隐藏边框
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        # self.setWindowOpacity(0.1)
 
         self._initQss()
         self._initLayout()
 
     def _initLayout(self):
         self.setLayout(self.hboxLayout)
-        self.hboxLayout.addWidget(self.dialog, 0, Qt.AlignmentFlag.AlignBottom)
+        self.hboxLayout.addWidget(self.dialog, 0, Qt.AlignmentFlag.AlignTop)
+        self.hboxLayout.addWidget(self.w)
+
+    def initLive2d(self):
+        globalPosition = self.geometry().center()
+        self.dll,self.dllThread = createLive2D(globalPosition.x(),globalPosition.y())
+
+    def updateFrom(self):
+        if self.dll is not None and isOK(self.dll):
+            # if not self.once:
+            #     # 获取C++程序的窗口句柄
+            #     cppWindow = win32gui.FindWindow(None, "VirtualPet")
+            #     # 获取Python程序的窗口句柄
+            #     pythonWindow = self.winId()
+            #     # 将窗口A置于窗口B之上
+            #     win32gui.SetWindowPos(pythonWindow, cppWindow, 0, 0, 0, 0, win32con.SWP_NOMOVE | win32con.SWP_NOSIZE | win32con.SWP_NOACTIVATE)
+            x, y = getPos(self.dll)
+            width = self.width()
+            height = self.height()
+            self.move(x - width // 2, y - height // 2)
+            self.activateWindow()
+            if isLeftTouched(self.dll):
+                self.dialog.show()
+                self.dialog.printDialog("主人，我在这里呢~")
+            if isRightTouched(self.dll):
+                self.contextMenuEvent(None)
 
     def _initQss(self):
-        self.setStyleSheet(f"MainWindow{{background: {self.config.MainWindow['Background']}}}")
+        self.setStyleSheet(f"""
+            MainWindow {{
+                background: {self.config.MainWindow['Background']};
+            }}
+        """)
 
     def contextMenuEvent(self, e):
         """
@@ -86,11 +124,19 @@ class MainWindow(QWidget):
 
         view.addHiddenAction(Action(FIF.SETTING, 'Settings', shortcut='Ctrl+S'))
         closeAction = Action(FIF.CLOSE, 'Close', shortcut='Ctrl+A')
-        closeAction.triggered.connect(lambda: self.close())
+        closeAction.triggered.connect(lambda: self.onClose())
         view.addHiddenAction(closeAction)
         view.resizeToSuitableWidth()
 
-        Flyout.make(view, self, self, FlyoutAnimationType.FADE_IN)
+        left = self.geometry().left()
+        h = self.geometry().height()
+        pos = QPoint(left, self.geometry().top() + h * 0.7)
+        Flyout.make(view, pos, self, FlyoutAnimationType.FADE_IN)
+
+    def onClose(self):
+        live2dClose(self.dll)
+        self.dllThread.join()
+        self.close()
 
     def draw(self):
         content,style,radio = self.showAIDialog("AI绘画","请输入图片关键字")
@@ -201,23 +247,3 @@ class MainWindow(QWidget):
         if w.exec():
             return w.urlLineEdit.text(),w.styleAI,w.radio
 
-    def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            # 在鼠标按下时记录初始位置
-            self.drag_start_position = event.pos()
-
-    def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            # 在鼠标释放时清除初始位置
-            self.drag_start_position = None
-
-    def mouseMoveEvent(self, event):
-        if event.buttons() & Qt.MouseButton.LeftButton:
-            # 在鼠标按下并移动时执行拖拽操作
-            if self.drag_start_position is not None:
-                # 计算鼠标移动的偏移量
-                offset = event.pos() - self.drag_start_position
-
-                # 更新QWidget的位置
-                new_position = self.pos() + offset
-                self.move(new_position)

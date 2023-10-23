@@ -1,7 +1,7 @@
 {
     "MainWindow":{
-        "Weight":600,
-        "Height":400,
+        "Weight":450,
+        "Height":800,
         "Background":"rgb(247,247,247)"
     },
     "Panel":{
@@ -117,5 +117,6 @@
     "Storage":"./storage/",
     "TempMusic":"./resource/temp/TempMusic",
     "TempPic":"./resource/temp/TempPic",
-    "PetName":"草薙寧々"
+    "PetName":"草薙寧々",
+    "Live2dPath":"./resource/live2d.dll"
 }

@@ -1,0 +1,223 @@
+{
+  "FileReferences": {
+    "Moc": "sub_nenechild.moc3",
+    "Motions": {
+      "Idle": [
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-pose01.motion3.json"
+        }
+			],
+      "TapBody":[
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-angry01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-angry02.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-blushed01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-fidget01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-fidget01angry01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-fidget02.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-forward01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-nod01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-nod02.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-nod03.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-nod04.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-pose02.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-pose03.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-pose04.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-poseblushed01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-sad01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-shakehead01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-shakehead02.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-shakehead03.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-shy01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-surprise01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-tilthead01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-tilthead02.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-tilthead03.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-tilthead04.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-tilthead05.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-trouble01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/c-nenechild-trouble02.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/face_angry_01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/face_closeeye_01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/face_e_01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/face_normal_01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/face_sad_01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/face_shy_01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/face_smallmouth_01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/face_smile_01.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/face_smile_02.motion3.json"
+        },
+        {
+          "FadeInTime": 0.5,
+          "FadeOutTime": 0.5,
+          "File": "motions/face_smile_03.motion3.json"
+        }
+      ]
+    },
+    "Physics": "sub_nenechild.physics3.json",
+    "Textures": [
+      "sub_nenechild.2048/texture_00.png"
+    ]
+  },
+  "Groups": [
+    {
+      "Ids": [],
+      "Name": "EyeBlink",
+      "Target": "Parameter"
+    },
+    {
+      "Ids": [],
+      "Name": "LipSync",
+      "Target": "Parameter"
+    }
+  ],
+  "Version": 3
+}

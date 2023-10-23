@@ -129,6 +129,7 @@ class CharacterDialogBox(QWidget):
         self.DialogBox = DialogBox("")
         self.characterBox = CharacterBox(name)
         self.DialogBox.hideSignal.connect(self.hide)
+        self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
 
         self._setLayout()
 
