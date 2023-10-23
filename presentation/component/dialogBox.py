@@ -11,6 +11,8 @@ class DialogBox(QFrame):
     """
     对话框的下面文字部分
     """
+    hideSignal = pyqtSignal()
+
     def __init__(self, content):
         super().__init__()
 
@@ -70,6 +72,8 @@ class DialogBox(QFrame):
             self.index = self.currentIndex
             self.label.setText("")
             self.state = 1
+        else:
+            self.hideSignal.emit()
 
     def _initQss(self):
         self.setStyleSheet(f"""
@@ -124,6 +128,7 @@ class CharacterDialogBox(QWidget):
 
         self.DialogBox = DialogBox("")
         self.characterBox = CharacterBox(name)
+        self.DialogBox.hideSignal.connect(self.hide)
 
         self._setLayout()
 

@@ -1,5 +1,12 @@
 from io import BytesIO
 
+class KeyWordDto():
+    """
+    关键词的dto
+    """
+    def __init__(self,keyword):
+        self.keyword = keyword
+
 class WeatherDto():
     """
     天气信息的dto
@@ -36,12 +43,28 @@ class MusicDataDto():
         self.type = type
         self.content:BytesIO = content
 
+class MusicIDDto():
+    """
+    音乐ID的dto
+    """
+    def __init__(self,id):
+        self.id = id
+
+class MusicURLDto():
+    """
+    音乐URL的dto
+    """
+    def __init__(self,url,type):
+        self.url = url
+        self.type = type
+
+
 class PictureDataDto():
     """
     图片数据的dto
     """
     def __init__(self,content):
-        self.content:BytesIO = content
+        self.content:bytes = content
 
 class SentanceDataDto():
     """

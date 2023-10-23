@@ -68,7 +68,7 @@
             "URL":"https://aiapiv2.animedb.cn/ai/api/detect",
             "Params":{
                 "force_one": 0,
-                "model": "anime",
+                "model": "anime_model_lovelive",
                 "ai_detect": 0
             }
         },
@@ -114,5 +114,8 @@
         }
     },
     "Database":"sqlite:///data.db",
-    "Storage":"./storage/"
+    "Storage":"./storage/",
+    "TempMusic":"./resource/temp/TempMusic",
+    "TempPic":"./resource/temp/TempPic",
+    "PetName":"草薙寧々"
 }

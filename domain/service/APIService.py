@@ -34,7 +34,7 @@ class APIService:
             raise WebAPIException(response.status_code, response.text)
         return WeatherDto(data['lives'][0]['weather'], data['lives'][0]['temperature'], data['lives'][0]['winddirection'], data['lives'][0]['windpower'], data['lives'][0]['humidity'], data['lives'][0]['reporttime'])
 
-    def getMusicData(self,keyword) -> MusicDataDto:
+    def getMusicID(self,keyword) -> MusicIDDto:
         """
         取得一首歌的下载 url
         TODO 暂未测试无版权的时候是否可用，这边之后拆一下
@@ -46,32 +46,19 @@ class APIService:
         data = response.json()
         if (response.status_code != 200):
             raise WebAPIException(response.status_code, response.text)
-        musicID = data['result']['songs'][0]['id']
+        return  MusicIDDto(data['result']['songs'][0]['id'])
 
+    def getMusicURL(self,id) -> MusicURLDto:
         getURL = self.config.WebAPI["Music"]["Get"]["URL"]
         getParams = self.config.WebAPI["Music"]["Get"]["Params"]
-        getParams['id'] = musicID
+        getParams['id'] = id
         response = requests.get(getURL, params=getParams)
         data = response.json()
         if (response.status_code != 200):
             raise WebAPIException(response.status_code, response.text)
         musicURL = data['data'][0]['url']
         audioType = data['data'][0]['type']
-
-        # 下载音频文件
-        response = requests.get(musicURL)
-        if (response.status_code != 200):
-            raise WebAPIException(response.status_code, response.text)
-        musicURL = data['data'][0]['url']
-        audioContent = io.BytesIO(response.content)
-
-        return MusicDataDto(audioType,audioContent)
-        # INFO 使用例
-        # a = test()
-        # data = a.getMusicData("neo")
-
-        # audio = AudioSegment.from_file(data.content, format=data.type)
-        # play(audio)
+        return MusicURLDto(musicURL,audioType)
 
     def getRandomPicture(self) -> PictureDataDto:
         """
@@ -79,7 +66,7 @@ class APIService:
         """
         url = self.config.WebAPI["Picture"]["URL"]
         response = requests.get(url)
-        return PictureDataDto(io.BytesIO(response.content))
+        return PictureDataDto(response.content)
         # INFO 使用例
         # url = GlobalConfig().WebAPI["Picture"]["URL"]
         # response = requests.get(url)
@@ -150,7 +137,7 @@ class APIService:
         day = data['day']
         contents:list[HistoryOnTodayItem] = []
         for item in data['result']:
-            contents.append(HistoryOnTodayItem(item["day"],item["itle"]))
+            contents.append(HistoryOnTodayItem(item["date"],item["title"]))
 
         return HistoryOnTodayDto(day,contents)
 
@@ -166,16 +153,16 @@ class APIService:
             response = await client.post(url, files=files, params=params)
             response.raise_for_status()
             data = response.json()
-        name = data["data"][0]['char'][0]['name']
-        wrok = data["data"][0]['char'][0]['cartoonname']
+        name = data["data"][0]['name']
+        wrok = data["data"][0]['cartoonname']
         return InfoFromImageDto(name,wrok)
 
     def getRandomMusic(self):
         """
         随机音乐，然后调用播放的接口
         """
-        url = self.config.WebAPI["Music"]["RandomMusic"]["URL"]
-        params = self.config.WebAPI["Music"]["RandomMusic"]["Params"]
+        url = self.config.WebAPI["Music"]["Random"]["URL"]
+        params = self.config.WebAPI["Music"]["Random"]["Params"]
         response = requests.get(url, params=params)
         data = response.json()
         return RandomMusicDto(data['id'],data['title'],data['artist'],data['cover'])
@@ -183,7 +170,7 @@ class APIService:
     def getTr(self,msg,to:LanguageTypeEnum) -> TrDto:
         """"
         翻译　
-        INFO　要求翻译文本大于2个字符，在APP里写一下吧
+        INFO　好像是翻译出来的文本太短和被翻译的文本太短都不行欸，还有翻译成中文有点bug
         """
         url = self.config.WebAPI["Translation"]["URL"]
         params = self.config.WebAPI["Translation"]["Params"]
@@ -193,14 +180,14 @@ class APIService:
         data = response.json()
         return TrDto(data["msg"])
 
-    def getWikiSearch(self,keyword):
+    def getWikiSearch(self,keyword) -> WikiSearchDto:
         """
         维基百科搜索
         """
         url = self.config.WebAPI["Wiki"]["URL"]
         params = self.config.WebAPI["Wiki"]["Params"]
         params.update(self.config.WebAPI["Wiki"]["SearchParams"])
-        params['lsrsearch'] = keyword
+        params['srsearch'] = keyword
         response = requests.get(url, params=params)
         data = response.json()
         results = []
@@ -218,7 +205,7 @@ class APIService:
         params['pageids'] = id
         response = requests.get(url, params=params)
         data = response.json()
-        return WikiDetailDto(data['query']['pages'][id]['title'],data['query']['pages'][id]['extract'])
+        return WikiDetailDto(data['query']['pages'][f'{id}']['title'],data['query']['pages'][f'{id}']['extract'])
 
     def getGPT(self,msg) -> GPTAnsDto :
         """
@@ -231,7 +218,7 @@ class APIService:
         params['messages'][0]['content'] = msg
         params['messages'][0]['role'] = "user"
         headers = self.config.WebAPI["GPT"]["Headers"]
-        response = requests.get(url, data=json.dumps(params),headers=headers)
+        response = requests.post(url, data=json.dumps(params),headers=headers)
         data = response.json()
         return GPTAnsDto(data['choices'][0]['message']['content'])
 
@@ -243,7 +230,7 @@ class APIService:
         params = self.config.WebAPI["AIDraw"]["Params"]
         params['imgTxt'] = txt
         params['style'] = style.value
-        params['radio'] = radio.value
-        response = requests.get(url, params=params)
+        params['ratio'] = radio.value
+        response = requests.post(url, data=params)
         data = response.json()
         return AIDrawDto(data['data']['result']['img'])
