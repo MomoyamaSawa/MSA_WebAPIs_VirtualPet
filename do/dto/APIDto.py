@@ -11,9 +11,7 @@ class WeatherDto():
     """
     天气信息的dto
     """
-    def __init__(self,province,city,weather,temperature,windDirection,windPower,humidity,reportTime):
-        self.province = province
-        self.city = city
+    def __init__(self,weather,temperature,windDirection,windPower,humidity,reportTime):
         self.weather = weather
         self.temperature = temperature
         self.windDirection = windDirection

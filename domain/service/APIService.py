@@ -30,7 +30,7 @@ class APIService:
         params = self.config.WebAPI["GetWeather"]["Params"]
         response = requests.get(url, params=params)
         data = response.json()
-        if (response.status_code != 200 | data['status'] != 0 | data['infocode'] != '10000'):
+        if (response.status_code != 200 or data['status'] != "1" or data['infocode'] != '10000'):
             raise WebAPIException(response.status_code, response.text)
         return WeatherDto(data['lives'][0]['weather'], data['lives'][0]['temperature'], data['lives'][0]['winddirection'], data['lives'][0]['windpower'], data['lives'][0]['humidity'], data['lives'][0]['reporttime'])
 

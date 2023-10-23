@@ -8,7 +8,7 @@ from qfluentwidgets import FluentIcon as FIF
 from application.PetApp import PetApplication
 from presentation.component.customMsgBox import *
 from presentation.component.dialogBox import CharacterDialogBox
-import shutil,asyncio
+import shutil,asyncio,random
 from util.live2D import *
 
 class MainWindow(QWidget):
@@ -68,8 +68,7 @@ class MainWindow(QWidget):
             self.move(x - width // 2, y - height // 2)
             self.activateWindow()
             if isLeftTouched(self.dll):
-                self.dialog.show()
-                self.dialog.printDialog("主人，我在这里呢~")
+                self.leftTap()
             if isRightTouched(self.dll):
                 self.contextMenuEvent(None)
 
@@ -79,6 +78,14 @@ class MainWindow(QWidget):
                 background: {self.config.MainWindow['Background']};
             }}
         """)
+    def leftTap(self):
+        randomNumber = random.random()
+        if randomNumber < 0.5 :
+            self.dialog.show()
+            self.dialog.printDialog(self.app.getSingle())
+        else:
+            self.dialog.show()
+            self.dialog.printDialog(self.app.getTimeAndWeather())
 
     def contextMenuEvent(self, e):
         """

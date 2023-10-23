@@ -4,6 +4,8 @@ from util.tools import *
 from common.LanguageType import LanguageTypeEnum
 from common.AIDrawType import AIDrawStyleEnum,AIDrawRadioEnum
 from PyQt6.QtCore import pyqtSignal,QObject
+from do.dto.APIDto import *
+from common.weekdayType import WeekDayEnumArr
 
 class PetApplication(QObject):
     getInfoFromImageSignal = pyqtSignal(str)
@@ -59,5 +61,12 @@ class PetApplication(QObject):
         return self.service.getGPT(msg).ans
 
 
+    def getSingle(self)->str:
+        dto = self.service.getSingleSentance()
+        return f"FROM {dto.where}({dto.who}): {dto.content}"
 
+    def getTimeAndWeather(self) -> str:
+        timeDTO = self.service.getTime()
+        wheatherDTO = self.service.getWeather()
+        return f"现在是{timeDTO.year}年{timeDTO.month}月{timeDTO.day}日{WeekDayEnumArr[int(timeDTO.weekDay)]}，天气为{wheatherDTO.weather}，温度{wheatherDTO.temperature}℃，湿度{wheatherDTO.humidity}%，风速{wheatherDTO.windPower}m/s"
 
