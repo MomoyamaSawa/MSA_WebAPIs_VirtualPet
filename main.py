@@ -1,9 +1,8 @@
 from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
-import sys, threading
+import sys
 from presentation.view.window import MainWindow
-from util.live2D import createLive2D
-
+from util.databaseCreate import checkDatabase
 
 if __name__ == "__main__":
 
@@ -12,4 +11,5 @@ if __name__ == "__main__":
     w.setWindowTitle("同济软院2023秋MSA课设多功能桌宠_2151641_王佳垚")
     w.show()
     w.initLive2d()
+    checkDatabase()
     app.exec()

@@ -1,13 +1,13 @@
 from util.config import GlobalConfig
 from datetime import datetime
-from do.dto.APIDto import *
+from do.APIDto import *
 import requests,httpx,json
 from exception import WebAPIException
 from common.LanguageType import LanguageTypeEnum
 from common.AIDrawType import *
 from common.RankingImgType import RankingImgType,RankingImgMode
 from datetime import datetime,timedelta
-from do.dto.PetDto import *
+from do.PetDto import *
 
 class APIService:
     """

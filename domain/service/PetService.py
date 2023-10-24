@@ -1,6 +1,6 @@
 from domain.model.optionLogAgg import OptionLogAgg
 from common.OptionType import OptionTypeEnum
-from do.dto.PetDto import *
+from do.PetDto import *
 from util.tools import fromDateTimeToStr
 
 class PetService():

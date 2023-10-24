@@ -5,7 +5,7 @@ from util.tools import *
 from common.LanguageType import LanguageTypeEnum
 from common.AIDrawType import *
 from PyQt6.QtCore import pyqtSignal,QObject
-from do.dto.APIDto import *
+from do.APIDto import *
 from common.weekdayType import WeekDayEnumArr
 
 class PetApplication(QObject):

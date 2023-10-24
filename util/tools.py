@@ -1,5 +1,5 @@
-from do.dto.APIDto import *
-import requests, random, time,datetime
+from do.APIDto import *
+import requests, random, datetime
 from exception import WebAPIException
 
 def downloadURLRes(url) -> bytes:

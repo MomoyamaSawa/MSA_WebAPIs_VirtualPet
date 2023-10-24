@@ -256,16 +256,3 @@ class MainWindow(QWidget):
         self.player.setSource(QUrl.fromLocalFile(GlobalConfig().TempMusic))
         self.player.play()
 
-    def showDialog(self,title,content):
-        """
-        已弃用
-        """
-        w = CustomMessageBox(self,title,content)
-        if w.exec():
-            return w.urlLineEdit.text()
-
-    def showAIDialog(self,title,content):
-        w = AIDrawMessageBox(self,title,content)
-        if w.exec():
-            return w.urlLineEdit.text(),w.styleAI,w.radio
-
