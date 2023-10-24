@@ -40,6 +40,13 @@ class MainWindow(QWidget):
         self.timer.timeout.connect(self.updateFrom)
         self.timer.start(100)  # 每100毫秒更新一次
 
+        self.isLeftTapOK = True
+        self.leftTapTimer = QTimer(self)
+        self.leftTapTimer.timeout.connect(lambda :self.setLeftTapOK(True))
+        self.leftTapTimer.setInterval(5000)
+        self.leftTapTimer.setSingleShot(True)
+
+
         # 隐藏边框
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
@@ -50,6 +57,9 @@ class MainWindow(QWidget):
     def _initLayout(self):
         self.setLayout(self.hboxLayout)
         self.hboxLayout.addWidget(self.dialog, 0, Qt.AlignmentFlag.AlignTop)
+
+    def setLeftTapOK(self,flag):
+        self.isLeftTapOK = flag
 
     @pyqtSlot()
     def initLive2d(self):
@@ -62,8 +72,10 @@ class MainWindow(QWidget):
             width = self.width()
             height = self.height()
             self.move(x - width // 2, y - height // 2)
-            if isLeftTouched(self.dll):
+            if isLeftTouched(self.dll) and self.isLeftTapOK:
                 self.leftTap()
+                self.isLeftTapOK = False
+                self.leftTapTimer.start()
             if isRightTouched(self.dll):
                 self.rightTap()
 

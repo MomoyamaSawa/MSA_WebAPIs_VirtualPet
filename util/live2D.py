@@ -3,14 +3,14 @@ from util.config import GlobalConfig
 
 def startAsync(dll,x,y):
     # 异步调用 start 函数并传递参数 x 和 y
-    dll.start(x, y)
+    dll.startLive2d(x, y)
 
 def createLive2D(x,y):
     # 加载 DLL 文件
     dll = ctypes.WinDLL(GlobalConfig().Live2dPath)
     # 定义函数参数和返回值类型
-    dll.start.argtypes = [ctypes.c_int, ctypes.c_int]
-    dll.start.restype = None
+    dll.startLive2d.argtypes = [ctypes.c_int, ctypes.c_int]
+    dll.startLive2d.restype = None
     # 异步调用 start 函数
     startThread = threading.Thread(target=startAsync,args=(dll,x,y))
     startThread.start()
@@ -32,9 +32,9 @@ def getPos(dll):
 
 def live2dClose(dll):
     # 定义函数参数和返回值类型
-    dll.close.argtypes = None
-    dll.close.restype = None
-    dll.close()
+    dll.closeLive2d.argtypes = None
+    dll.closeLive2d.restype = None
+    dll.closeLive2d()
 
 def isLeftTouched(dll):
     # 定义函数参数和返回值类型
