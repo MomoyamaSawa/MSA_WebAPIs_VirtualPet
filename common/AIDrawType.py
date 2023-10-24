@@ -1,5 +1,31 @@
 from enum import Enum
 
+AIOptionsStyle = [
+    '二次元',
+    '探索无限',
+    '古风',
+    '写实风格',
+    '浮世绘',
+    'low poly',
+    '未来主义',
+    '像素风格',
+    '概念艺术',
+    '赛博朋克',
+    '洛丽塔风格',
+    '巴洛克风格',
+    '超现实主义',
+    '水彩画',
+    '蒸汽波艺术',
+    '油画',
+    '卡通画'
+]
+AIOptionsRatio = [
+        '1:1',
+        '3:2',
+        '2:3'
+    ]
+
+
 class AIDrawStyleEnum(Enum):
     EXPLORATION = '探索无限'
     ANCIENT_STYLE = '古风'
@@ -19,7 +45,7 @@ class AIDrawStyleEnum(Enum):
     OIL_PAINTING = '油画'
     CARTOON = '卡通画'
 
-class AIDrawRadioEnum(Enum):
+class AIDrawRatioEnum(Enum):
     RATIO_1_1 = "1:1"
     RATIO_3_2 = "3:2"
     RATIO_2_3 = "2:3"

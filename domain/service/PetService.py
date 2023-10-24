@@ -1,0 +1,99 @@
+from domain.model.optionLogAgg import OptionLogAgg
+from common.OptionType import OptionTypeEnum
+from do.dto.PetDto import *
+from util.tools import fromDateTimeToStr
+
+class PetService():
+    def __init__(self):
+        pass
+
+    def writeGPTLog(self,q,a):
+        """
+        写入GPT日志
+        """
+        gptLog = {
+            "问题":q,
+            "回答":a
+        }
+        optionLogAgg = OptionLogAgg(OptionTypeEnum.GPT,gptLog)
+        optionLogAgg.writeOptionLog()
+
+    def getGPTLogs(self,n) -> list[GptLogItem]:
+        """
+        获取GPT日志
+        """
+        aggs = OptionLogAgg.getGptLogs(n)
+        logs = []
+        for agg in aggs:
+            dt = fromDateTimeToStr(agg.time)
+            log = GptLogItem(agg.content["问题"],agg.content["回答"],dt)
+            logs.append(log)
+        return list(reversed(logs))
+
+    def writeMusicLog(self,keyword,name):
+        musicLog = {
+            "关键词":keyword,
+            "歌曲名":name
+        }
+        optionLogAgg = OptionLogAgg(OptionTypeEnum.MUSIC,musicLog)
+        optionLogAgg.writeOptionLog()
+
+    def writeRandomMusicLog(self,title,author):
+        musicLog = {
+            "标题":title,
+            "作者":author
+        }
+        optionLogAgg = OptionLogAgg(OptionTypeEnum.RANDOM_MUSIC,musicLog)
+        optionLogAgg.writeOptionLog()
+
+    def writeRandomPicLog(self,url):
+        picLog = {
+            "url":url
+        }
+        optionLogAgg = OptionLogAgg(OptionTypeEnum.RANDOM_PIC,picLog)
+        optionLogAgg.writeOptionLog()
+
+    def writeInfoFromImageLog(self,path,name,work):
+        infoLog = {
+            "path":path,
+            "name":name,
+            "work":work
+        }
+        optionLogAgg = OptionLogAgg(OptionTypeEnum.INFO_FROM_IMAGE,infoLog)
+        optionLogAgg.writeOptionLog()
+
+    def writeAIDrawLog(self,content,style,radio,url):
+        aiDrawLog = {
+            "content":content,
+            "style":style,
+            "radio":radio,
+            "url":url
+        }
+        optionLogAgg = OptionLogAgg(OptionTypeEnum.AI_DRAW,aiDrawLog)
+        optionLogAgg.writeOptionLog()
+
+    def writeTrLog(self,msg,ans,to):
+        trLog = {
+            "msg":msg,
+            "ans":ans,
+            "to":to
+        }
+        optionLogAgg = OptionLogAgg(OptionTypeEnum.TR,trLog)
+        optionLogAgg.writeOptionLog()
+
+    def writeWikiLog(self,keyword,title,content):
+        wikiLog = {
+            "keyword":keyword,
+            "title":title,
+            "content":content
+        }
+        optionLogAgg = OptionLogAgg(OptionTypeEnum.WIKI,wikiLog)
+        optionLogAgg.writeOptionLog()
+
+    def writeHistoryLog(self,day,content):
+        historyLog = {
+            "day":day,
+            "content":content
+        }
+        optionLogAgg = OptionLogAgg(OptionTypeEnum.HISTORY,historyLog)
+        optionLogAgg.writeOptionLog()

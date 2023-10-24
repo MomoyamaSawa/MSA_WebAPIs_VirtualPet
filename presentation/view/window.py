@@ -10,36 +10,39 @@ from presentation.component.customMsgBox import *
 from presentation.component.dialogBox import CharacterDialogBox
 import shutil,asyncio,random
 from util.live2D import *
+from common.AIDrawType import *
+from common.LanguageType import *
 
 class MainWindow(QWidget):
     """
-    桌宠程序的主界面
+    桌宠程序的主操作界面
     """
-
     def __init__(self):
         super().__init__()
         self.config = GlobalConfig()
         self.resize(self.config.MainWindow["Weight"], self.config.MainWindow["Height"])
         self.hboxLayout = QHBoxLayout(self)
+
         self.app = PetApplication()
-        self.app.getInfoFromImageSignal.connect(self.getSearchInfo)
+        self.app.getInfoFromImageSignal.connect(self.showMsg)
+
         self.audioOutput = QAudioOutput()
-        self.audioOutput.setVolume(100)
+        self.audioOutput.setVolume(50)
         self.player = QMediaPlayer()
         self.player.setAudioOutput(self.audioOutput)
+
         self.dialog = CharacterDialogBox(GlobalConfig().PetName)
         self.dialog.hide()
-        self.w = QWidget()
+        self.frombox = None
+
         self.dll = None
-        self.once = False
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.updateFrom)
-        self.timer.start(100)  # 每100毫秒更新一次位置
+        self.timer.start(100)  # 每100毫秒更新一次
 
         # 隐藏边框
-        self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
+        self.setWindowFlag(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-        # self.setWindowOpacity(0.1)
 
         self._initQss()
         self._initLayout()
@@ -47,30 +50,22 @@ class MainWindow(QWidget):
     def _initLayout(self):
         self.setLayout(self.hboxLayout)
         self.hboxLayout.addWidget(self.dialog, 0, Qt.AlignmentFlag.AlignTop)
-        self.hboxLayout.addWidget(self.w)
 
+    @pyqtSlot()
     def initLive2d(self):
         globalPosition = self.geometry().center()
         self.dll,self.dllThread = createLive2D(globalPosition.x(),globalPosition.y())
 
     def updateFrom(self):
         if self.dll is not None and isOK(self.dll):
-            # if not self.once:
-            #     # 获取C++程序的窗口句柄
-            #     cppWindow = win32gui.FindWindow(None, "VirtualPet")
-            #     # 获取Python程序的窗口句柄
-            #     pythonWindow = self.winId()
-            #     # 将窗口A置于窗口B之上
-            #     win32gui.SetWindowPos(pythonWindow, cppWindow, 0, 0, 0, 0, win32con.SWP_NOMOVE | win32con.SWP_NOSIZE | win32con.SWP_NOACTIVATE)
             x, y = getPos(self.dll)
             width = self.width()
             height = self.height()
             self.move(x - width // 2, y - height // 2)
-            self.activateWindow()
             if isLeftTouched(self.dll):
                 self.leftTap()
             if isRightTouched(self.dll):
-                self.contextMenuEvent(None)
+                self.rightTap()
 
     def _initQss(self):
         self.setStyleSheet(f"""
@@ -78,44 +73,39 @@ class MainWindow(QWidget):
                 background: {self.config.MainWindow['Background']};
             }}
         """)
-    def leftTap(self):
-        randomNumber = random.random()
-        if randomNumber < 0.5 :
-            self.dialog.show()
-            self.dialog.printDialog(self.app.getSingle())
-        else:
-            self.dialog.show()
-            self.dialog.printDialog(self.app.getTimeAndWeather())
 
-    def contextMenuEvent(self, e):
+    def leftTap(self):
+        if self.frombox is not None:
+            self.frombox.hide()
+            self.frombox.deleteLater()
+            self.frombox = None
+        randomNumber = random.random()
+        if randomNumber < 0.75 :
+            self.showMsg(self.app.getSingle())
+        else:
+            self.showMsg(self.app.getTimeAndWeather())
+
+    def rightTap(self):
         """
         自定义鼠标右键事件，调出控制仪表盘
         """
         view = CommandBarView(self)
 
+        gpt = Action(FIF.MESSAGE, 'GPT猫娘')
+        view.addAction(gpt)
+        gpt.triggered.connect(self.gpt)
+
         music = Action(FIF.MUSIC, '播放音乐')
         view.addAction(music)
         music.triggered.connect(self.playMusic)
-
-        pic = Action(FIF.PALETTE, '随机图片')
-        view.addAction(pic)
-        pic.triggered.connect(self.showRandomPic)
-
-        wiki = Action(FIF.BOOK_SHELF, '维基百科')
-        view.addAction(wiki)
-        wiki.triggered.connect(self.showWiki)
-
-        history = Action(FIF.HISTORY, '历史上今天的事')
-        view.addAction(history)
-        history.triggered.connect(self.showHistoryOntoday)
 
         randomMusic = Action(FIF.CALORIES, '随机二次元音乐')
         view.addAction(randomMusic)
         randomMusic.triggered.connect(self.randomMusic)
 
-        tr = Action(FIF.LANGUAGE, '中日翻译')
-        view.addAction(tr)
-        tr.triggered.connect(self.tr)
+        pic = Action(FIF.PALETTE, '随机图片')
+        view.addAction(pic)
+        pic.triggered.connect(self.showRandomPic)
 
         search = Action(FIF.SEARCH_MIRROR, '二次元识别')
         view.addAction(search)
@@ -125,12 +115,20 @@ class MainWindow(QWidget):
         view.addAction(draw)
         draw.triggered.connect(self.draw)
 
-        gpt = Action(FIF.MESSAGE, 'GPT猫娘')
-        view.addAction(gpt)
-        gpt.triggered.connect(self.gpt)
+        tr = Action(FIF.LANGUAGE, '翻译')
+        view.addAction(tr)
+        tr.triggered.connect(self.tr)
 
-        view.addHiddenAction(Action(FIF.SETTING, 'Settings', shortcut='Ctrl+S'))
-        closeAction = Action(FIF.CLOSE, 'Close', shortcut='Ctrl+A')
+        wiki = Action(FIF.BOOK_SHELF, '维基百科')
+        view.addAction(wiki)
+        wiki.triggered.connect(self.showWiki)
+
+        history = Action(FIF.HISTORY, '历史上今天的事')
+        view.addAction(history)
+        history.triggered.connect(self.showHistoryOntoday)
+
+        view.addHiddenAction(Action(FIF.SETTING, '设置'))
+        closeAction = Action(FIF.CLOSE, '关闭')
         closeAction.triggered.connect(lambda: self.onClose())
         view.addHiddenAction(closeAction)
         view.resizeToSuitableWidth()
@@ -146,60 +144,73 @@ class MainWindow(QWidget):
         self.close()
 
     def draw(self):
-        content,style,radio = self.showAIDialog("AI绘画","请输入图片关键字")
-        if content is None:
-            return
-        self.app.drawAI(content,style,radio)
+        frombox = self.showFromBox("AI绘画","请输入图片关键字",[AIOptionsStyle,AIOptionsRatio])
+        frombox.fromContentSignal.connect(self._draw)
+
+    def _draw(self,content,index):
+        self.app.drawAI(content,AIOptionsStyle[index[0]],AIOptionsRatio[index[1]])
         self.showPicTip()
 
     def gpt(self):
-        keyword,_ = self.showDialog("GPT猫娘", "请输入对话内容")
-        if keyword is None:
-            return
-        msg = self.app.getGPT(keyword)
-        self.dialog.show()
-        self.dialog.printDialog(msg)
+        frombox = self.showFromBox("GPT猫娘","请输入对话内容")
+        frombox.fromContentSignal.connect(self._gpt)
+
+    @pyqtSlot(str)
+    def _gpt(self,content):
+        msg = self.app.getGPT(content)
+        self.showMsg(msg)
+
+    def showFromBox(self,title,content,options=None):
+        if self.dialog.isVisible():
+            self.dialog.hide()
+        if self.frombox is not None:
+            self.frombox.hide()
+            self.frombox.deleteLater()
+            self.frombox = None
+        self.frombox = FromBox(title,content,options)
+        self.hboxLayout.addWidget(self.frombox,0,Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignCenter)
+        return self.frombox
 
     def randomMusic(self):
         title,author = self.app.getRandomMusic()
         self.player.setSource(QUrl.fromLocalFile(GlobalConfig().TempMusic))
         self.player.play()
-        self.dialog.show()
-        self.dialog.printDialog(f"正在播放：{title}，作者：{author}")
+        self.showMsg(f"正在播放：{title}，作者：{author}")
 
     def search(self):
         # 打开文件选择对话框
-        file, _ = QFileDialog.getOpenFileName(self, "选择图片文件", "", "Image Files (*.png *.jpg *.jpeg)")
+        file, _ = QFileDialog.getOpenFileName(self, "选择图片文件", "", "Image Files (*.png *.jpg)")
         asyncio.run(self.app.getInfoFromImage(file))
 
-    def getSearchInfo(self,info):
+    def showMsg(self,msg):
         self.dialog.show()
-        self.dialog.printDialog(info)
+        self.dialog.printDialog(msg)
 
     def tr(self):
-        keyword,type = self.showDialog("翻译","请输入要翻译的文本",["日语","英语","中文"])
-        if keyword is None:
-            return
-        msg = self.app.getTr(keyword,type)
-        self.dialog.show()
-        self.dialog.printDialog(f"{msg}")
+        frombox = self.showFromBox("翻译","请输入要翻译的文本",[languageOptions])
+        frombox.fromContentSignal.connect(self._tr)
+
+    def _tr(self,keyword,index):
+        # 去除“To ”
+        msg = self.app.getTr(keyword,languageOptions[index[0]][3:])
+        self.showMsg(msg)
 
     def showHistoryOntoday(self):
         day,content = self.app.getHistoryOnToday()
-        self.dialog.show()
-        self.dialog.printDialog(f"{day}，{content}")
+        self.showMsg(f"{day}，{content}")
+
 
     def showRandomPic(self):
         self.app.getRandomPicToFile()
         self.showPicTip()
 
     def showWiki(self):
-        keyword,_ = self.showDialog("wiki","请输入关键字")
-        if keyword is None:
-            return
+        frombox = self.showFromBox("wiki","请输入关键字")
+        frombox.fromContentSignal.connect(self._showWiki)
+
+    def _showWiki(self,keyword):
         msg = self.app.getWiki(keyword)
-        self.dialog.show()
-        self.dialog.printDialog(msg)
+        self.showMsg(msg)
 
     def showPicTip(self):
         position = TeachingTipTailPosition.RIGHT
@@ -208,7 +219,6 @@ class MainWindow(QWidget):
             title='𝓖𝓪𝓵𝓵𝓪𝓻𝔂',
             content="𝑨𝒓𝒕 𝒊𝒔 𝒕𝒉𝒆 𝒍𝒊𝒆 𝒕𝒉𝒂𝒕 𝒆𝒏𝒂𝒃𝒍𝒆𝒔 𝒖𝒔 𝒕𝒐 𝒓𝒆𝒂𝒍𝒊𝒛𝒆 𝒕𝒉𝒆 𝒕𝒓𝒖𝒕𝒉.",
             image=GlobalConfig().TempPic,
-            # image='resource/boqi.gif',
             isClosable=True,
             tailPosition=TeachingTipTailPosition.BOTTOM,
         )
@@ -237,17 +247,22 @@ class MainWindow(QWidget):
             print("未选择保存路径或文件名")
 
     def playMusic(self):
-        keyword = self.showDialog("播放音乐", "请输入歌曲关键字")
-        if keyword is None:
-            return
-        self.app.getMusicToFile(keyword)
+        frombox = self.showFromBox("播放音乐", "请输入歌曲关键字")
+        frombox.fromContentSignal.connect(self._playMusic)
+
+    @pyqtSlot(str)
+    def _playMusic(self,keyWord):
+        self.app.getMusicToFile(keyWord)
         self.player.setSource(QUrl.fromLocalFile(GlobalConfig().TempMusic))
         self.player.play()
 
-    def showDialog(self,title,content,options=None):
-        w = CustomMessageBox(self,title,content,options)
+    def showDialog(self,title,content):
+        """
+        已弃用
+        """
+        w = CustomMessageBox(self,title,content)
         if w.exec():
-            return w.urlLineEdit.text(),w.type
+            return w.urlLineEdit.text()
 
     def showAIDialog(self,title,content):
         w = AIDrawMessageBox(self,title,content)

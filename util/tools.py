@@ -1,5 +1,5 @@
 from do.dto.APIDto import *
-import requests,io, random
+import requests, random, time,datetime
 from exception import WebAPIException
 
 def downloadURLRes(url) -> bytes:
@@ -12,7 +12,6 @@ def saveTofile(data:bytes, filename):
     try:
         with open(filename, 'wb') as file:
             file.write(data)
-        print('已保存到文件:', filename)
     except Exception as e:
         print('保存文件时发生错误:', str(e))
 
@@ -22,3 +21,6 @@ def chooseRandomElement(array):
         return random_element
     else:
         return None
+
+def fromDateTimeToStr(dateTime:datetime):
+    return dateTime.strftime("%Y-%m-%d %H:%M:%S")

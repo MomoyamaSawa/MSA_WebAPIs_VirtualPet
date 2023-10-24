@@ -31,7 +31,6 @@ class TimeDto():
         self.hour = hour
         self.weekDay = weekDay
 
-
 class MusicDataDto():
     """
     音乐数据的dto
@@ -40,22 +39,6 @@ class MusicDataDto():
         self.name = name
         self.type = type
         self.content:BytesIO = content
-
-class MusicIDDto():
-    """
-    音乐ID的dto
-    """
-    def __init__(self,id):
-        self.id = id
-
-class MusicURLDto():
-    """
-    音乐URL的dto
-    """
-    def __init__(self,url,type):
-        self.url = url
-        self.type = type
-
 
 class PictureDataDto():
     """
@@ -137,13 +120,6 @@ class WikiDetailDto():
     def __init__(self,title,content):
         self.title = title
         self.content = content
-
-class GPTAnsDto():
-    """
-    GPT回答的dto
-    """
-    def __init__(self,ans):
-        self.ans = ans
 
 class SearchImagesItem():
     """

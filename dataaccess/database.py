@@ -8,12 +8,22 @@ import sys
 class DatabaseRepository():
     """
     本地数据库操作
+    TODO 之后写错误try
     """
     def __init__(self):
-        self.config = GlobalConfig()
-        self.engine = create_engine(self.config.Database)
+        self.engine = create_engine(GlobalConfig().Database)
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
+
+    def add(self, entity):
+        self.session.add(entity)
+        self.session.commit()
+
+    def adds(self, entities):
+        self.session.add_all(entities)
+        self.session.commit()
+
+
 
 # 饿汉模式
 if not hasattr(sys, 'isInitializedDatabase'):

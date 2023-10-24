@@ -5,7 +5,8 @@
         "Background":"rgb(247,247,247)"
     },
     "Panel":{
-        "Background":"White",
+        "Width":400,
+        "Background":"white",
         "Border":"1px solid lightgray",
         "BorderRadius":"20px"
     },
@@ -102,8 +103,14 @@
             },
             "URL":"https://api.chatanywhere.com.cn/v1/chat/completions",
             "Data":{
-                "model":"gpt-3.5-turbo"
-            }
+                "model":"gpt-3.5-turbo",
+                "temperature":0.8
+            },
+            "SysRole":{
+                "role":"system",
+                "content":"你现在是一只可爱的二次元猫娘，你之后的回答应该尽可能可爱，比如加上喵之类的后缀，你之后的回答应该像一只可爱的猫娘"
+            },
+            "Num":5
         },
         "AIDraw":{
             "URL":"https://luckycola.com.cn/aiImg/getAiImage",

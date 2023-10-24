@@ -1,12 +1,13 @@
 from util.config import GlobalConfig
 from datetime import datetime
 from do.dto.APIDto import *
-import requests,io,httpx,json
+import requests,httpx,json
 from exception import WebAPIException
 from common.LanguageType import LanguageTypeEnum
-from common.AIDrawType import AIDrawStyleEnum,AIDrawRadioEnum
+from common.AIDrawType import *
 from common.RankingImgType import RankingImgType,RankingImgMode
 from datetime import datetime,timedelta
+from do.dto.PetDto import *
 
 class APIService:
     """
@@ -34,7 +35,7 @@ class APIService:
             raise WebAPIException(response.status_code, response.text)
         return WeatherDto(data['lives'][0]['weather'], data['lives'][0]['temperature'], data['lives'][0]['winddirection'], data['lives'][0]['windpower'], data['lives'][0]['humidity'], data['lives'][0]['reporttime'])
 
-    def getMusicID(self,keyword) -> MusicIDDto:
+    def getMusicID(self,keyword) -> str:
         """
         取得一首歌的下载 url
         TODO 暂未测试无版权的时候是否可用，这边之后拆一下
@@ -46,9 +47,9 @@ class APIService:
         data = response.json()
         if (response.status_code != 200):
             raise WebAPIException(response.status_code, response.text)
-        return  MusicIDDto(data['result']['songs'][0]['id'])
+        return data['result']['songs'][0]['id'],data['result']['songs'][0]['name']
 
-    def getMusicURL(self,id) -> MusicURLDto:
+    def getMusicURL(self,id) -> (str,type):
         getURL = self.config.WebAPI["Music"]["Get"]["URL"]
         getParams = self.config.WebAPI["Music"]["Get"]["Params"]
         getParams['id'] = id
@@ -57,25 +58,15 @@ class APIService:
         if (response.status_code != 200):
             raise WebAPIException(response.status_code, response.text)
         musicURL = data['data'][0]['url']
-        audioType = data['data'][0]['type']
-        return MusicURLDto(musicURL,audioType)
+        return musicURL
 
-    def getRandomPicture(self) -> PictureDataDto:
+    def getRandomPicture(self) -> (str,bytes):
         """
         获得随机图片的数据
         """
         url = self.config.WebAPI["Picture"]["URL"]
         response = requests.get(url)
-        return PictureDataDto(response.content)
-        # INFO 使用例
-        # url = GlobalConfig().WebAPI["Picture"]["URL"]
-        # response = requests.get(url)
-        # image_data = response.content
-        # # 使用PIL库加载二进制数据为图像
-        # image = Image.open(io.BytesIO(image_data))
-
-        # # 显示图像
-        # image.show()
+        return url,response.content
 
     def getSingleSentance(self) -> SentanceDataDto:
         """
@@ -138,10 +129,9 @@ class APIService:
         contents:list[HistoryOnTodayItem] = []
         for item in data['result']:
             contents.append(HistoryOnTodayItem(item["date"],item["title"]))
-
         return HistoryOnTodayDto(day,contents)
 
-    async def getInfoFromImage(self,filePath) -> InfoFromImageDto:
+    async def getInfoFromImage(self,filePath) -> (str,str):
         """
         TODO 图像识别出动漫，之后加一点识别是否为AI图，还有识别的是动漫还是gal的参数进去吧
         """
@@ -153,13 +143,12 @@ class APIService:
             response = await client.post(url, files=files, params=params)
             response.raise_for_status()
             data = response.json()
-        name = data["data"][0]['name']
-        wrok = data["data"][0]['cartoonname']
-        return InfoFromImageDto(name,wrok)
+        return data["data"][0]['name'],data["data"][0]['cartoonname']
 
-    def getRandomMusic(self):
+    def getRandomMusic(self) -> RandomMusicDto:
         """
         随机音乐，然后调用播放的接口
+        TODO 有没有办法把封面也展示一下
         """
         url = self.config.WebAPI["Music"]["Random"]["URL"]
         params = self.config.WebAPI["Music"]["Random"]["Params"]
@@ -167,7 +156,7 @@ class APIService:
         data = response.json()
         return RandomMusicDto(data['id'],data['title'],data['artist'],data['cover'])
 
-    def getTr(self,msg,to:LanguageTypeEnum) -> TrDto:
+    def getTr(self,msg,to:LanguageTypeEnum):
         """"
         翻译　
         INFO　好像是翻译出来的文本太短和被翻译的文本太短都不行欸，还有翻译成中文有点bug
@@ -178,7 +167,7 @@ class APIService:
         params['to'] = to.value
         response = requests.get(url, params=params)
         data = response.json()
-        return TrDto(data["msg"])
+        return data["msg"]
 
     def getWikiSearch(self,keyword) -> WikiSearchDto:
         """
@@ -207,22 +196,37 @@ class APIService:
         data = response.json()
         return WikiDetailDto(data['query']['pages'][f'{id}']['title'],data['query']['pages'][f'{id}']['extract'])
 
-    def getGPT(self,msg) -> GPTAnsDto :
+    def getGPT(self,msg,logs:list[GptLogsDto]) -> str :
         """
         GPT-3.5
-        TODO 之后多研究一下参数，还有从数据库里读出之前的对话做记忆化
         """
-        url = self.config.WebAPI["GPT"]["URL"]
-        params = self.config.WebAPI["GPT"]["Data"]
-        params['messages'] = [{}]
-        params['messages'][0]['content'] = msg
-        params['messages'][0]['role'] = "user"
-        headers = self.config.WebAPI["GPT"]["Headers"]
+        url = GlobalConfig().WebAPI["GPT"]["URL"]
+        params = GlobalConfig().WebAPI["GPT"]["Data"]
+        sysRole = GlobalConfig().WebAPI["GPT"]["SysRole"]
+        params['messages'] = []
+        params['messages'].append(sysRole)
+        for log in logs:
+            q = {
+                "content":log.question,
+                "role":"user"
+            }
+            a = {
+                "content":log.answer,
+                "role":"assistant"
+            }
+            params['messages'].append(q)
+            params['messages'].append(a)
+        now = {
+            "content":msg,
+            "role":"user"
+        }
+        params['messages'].append(now)
+        headers = GlobalConfig().WebAPI["GPT"]["Headers"]
         response = requests.post(url, data=json.dumps(params),headers=headers)
         data = response.json()
-        return GPTAnsDto(data['choices'][0]['message']['content'])
+        return data['choices'][0]['message']['content']
 
-    def getAIDraw(self,txt,style: AIDrawStyleEnum,radio: AIDrawRadioEnum) -> AIDrawDto:
+    def getAIDraw(self,txt,style: AIDrawStyleEnum,radio: AIDrawRatioEnum) -> AIDrawDto:
         """
         AI画画
         """
@@ -233,4 +237,4 @@ class APIService:
         params['ratio'] = radio.value
         response = requests.post(url, data=params)
         data = response.json()
-        return AIDrawDto(data['data']['result']['img'])
+        return data['data']['result']['img']

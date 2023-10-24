@@ -1,15 +1,22 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, String,TIMESTAMP, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from dataaccess.database import DatabaseRepository
 
 Base = declarative_base()
-database = DatabaseRepository()
 
-class User(Base):
-    __tablename__ = 'users'
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    email = Column(String)
+class OptionType(Base):
+    __tablename__ = 'OPTION_TYPE'
+    name = Column(String,primary_key=True)
 
-# 创建表格
-Base.metadata.create_all(database.engine)
+class OptionLog(Base):
+    __tablename__ = 'OPTION_LOG'
+    id = Column(String, primary_key=True)
+    time = Column(TIMESTAMP)
+    type = Column(String,ForeignKey('OPTION_TYPE.name'))
+    content = Column(String)
+
+class ExceptionLog(Base):
+    __tablename__ = 'EXCEPTION_LOG'
+    id = Column(String, primary_key=True)
+    time = Column(TIMESTAMP)
+    content = Column(String)
+
