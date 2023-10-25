@@ -26,7 +26,6 @@ class MainWindow(QWidget):
         self.hboxLayout = QHBoxLayout(self)
 
         self.app = PetApplication()
-        self._initConnections()
         self.threadPool = QThreadPool()
 
         self.audioOutput = QAudioOutput()
@@ -47,7 +46,7 @@ class MainWindow(QWidget):
         self.isLeftTapOK = True
         self.leftTapTimer = QTimer(self)
         self.leftTapTimer.timeout.connect(lambda :self.setLeftTapOK(True))
-        self.leftTapTimer.setInterval(5000)
+        self.leftTapTimer.setInterval(10000)
         self.leftTapTimer.setSingleShot(True)
 
         # 隐藏边框
@@ -56,13 +55,15 @@ class MainWindow(QWidget):
 
         self._initQss()
         self._initLayout()
+        self._initConnections()
 
     def _initConnections(self):
         self.app.getInfoFromImageSignal.connect(self.showMainMsg)
         self.app.singleSentanceSignal.connect(self.showMsg)
         self.app.wheatherSignal.connect(self.showMsg)
         self.app.gptSignal.connect(self.showMainMsg)
-
+        self.app.musicToFileSignal.connect(self._playMusicFromFile)
+        self.app.musicToFileSignal.connect(self.stopLoopMsg)
 
     def _initLayout(self):
         self.setLayout(self.hboxLayout)
@@ -180,7 +181,7 @@ class MainWindow(QWidget):
     def _gpt(self,content):
         f = FunctionRunnable(self.app.getGPT,content)
         self.threadPool.start(f)
-        self.showWaitMsg()
+        self.showWaitMsg("思考中.....")
 
     def showFromBox(self,title,content,options=None):
         self.frombox = FromBox(title,content,options)
@@ -217,9 +218,9 @@ class MainWindow(QWidget):
         self.dialog.hideSignal.disconnect(self._setHideSlot)
         self.setLeftTapOK(True)
 
-    def showWaitMsg(self):
+    def showWaitMsg(self,text):
         self.stateMa.setState(DialogState(self.dialog))
-        self.dialog.printLoopDialog(GlobalConfig().PetName + "思考中.....",GlobalConfig().Timeout)
+        self.dialog.printLoopDialog(GlobalConfig().PetName + text,GlobalConfig().Timeout)
         self.setLeftTapOK(False)
         self.leftTapTimer.stop()
 
@@ -288,6 +289,17 @@ class MainWindow(QWidget):
 
     @pyqtSlot(str)
     def _playMusic(self,keyWord):
-        self.app.getMusicToFile(keyWord)
+        f = FunctionRunnable(self.app.getMusicToFile,keyWord)
+        self.threadPool.start(f)
+        self.showWaitMsg("查询中.....")
+
+    @pyqtSlot()
+    def _playMusicFromFile(self):
         self.player.setSource(QUrl.fromLocalFile(GlobalConfig().TempMusic))
         self.player.play()
+
+    @pyqtSlot()
+    def stopLoopMsg(self):
+        self.setLeftTapOK(True)
+        self.leftTapTimer.start()
+        self.dialog.stopDialog()

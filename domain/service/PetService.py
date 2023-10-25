@@ -39,6 +39,7 @@ class PetService():
         }
         optionLogAgg = OptionLogAgg(OptionTypeEnum.MUSIC,musicLog)
         optionLogAgg.writeOptionLog()
+        return str(optionLogAgg)
 
     def writeRandomMusicLog(self,title,author):
         musicLog = {

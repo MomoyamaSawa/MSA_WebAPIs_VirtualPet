@@ -56,6 +56,11 @@ class DialogBox(QFrame):
             self.timeTimer.start(time*1000)
             self.isOK = False
 
+    def stopDialog(self):
+        self.timer.stop()
+        self.timeTimer.stop()
+        self.isOK = True
+
     def timeoutFunc(self):
         self.timer.stop()
         self.timeTimer.stop()
@@ -171,6 +176,10 @@ class CharacterDialogBox(QWidget):
         self.hideSignal.emit()
         return super().hideEvent(a0)
 
+    @pyqtSlot()
+    def stopDialog(self):
+        self.DialogBox.stopDialog()
+        self.hide()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

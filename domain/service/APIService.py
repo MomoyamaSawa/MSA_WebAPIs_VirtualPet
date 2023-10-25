@@ -40,15 +40,16 @@ class APIService:
     def getMusicID(self,keyword) -> str:
         """
         取得一首歌的下载 url
+
         TODO 暂未测试无版权的时候是否可用，这边之后拆一下
         """
         searchURL = self.config.WebAPI["Music"]["Search"]["URL"]
         searchParams = self.config.WebAPI["Music"]["Search"]["Params"]
         searchParams['keywords'] = keyword
-        response = requests.get(searchURL, params=searchParams)
+        with httpx.Client() as client:
+            response = client.get(searchURL, params=searchParams)
+            response.raise_for_status()
         data = response.json()
-        if (response.status_code != 200):
-            raise WebAPIException(response.status_code, response.text)
         return data['result']['songs'][0]['id'],data['result']['songs'][0]['name']
 
     def getMusicURL(self,id) -> (str,type):

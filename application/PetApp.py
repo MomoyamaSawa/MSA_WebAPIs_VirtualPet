@@ -14,6 +14,7 @@ class PetApplication(QObject):
     singleSentanceSignal = pyqtSignal(str)
     wheatherSignal = pyqtSignal(str)
     gptSignal = pyqtSignal(str)
+    musicToFileSignal = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -22,11 +23,16 @@ class PetApplication(QObject):
 
     def getMusicToFile(self,keyword):
         # TODO 模糊搜索面板
-        musicID,name = self.service.getMusicID(keyword)
-        musicURL = self.service.getMusicURL(musicID)
-        data = downloadURLRes(musicURL)
-        saveTofile(data,GlobalConfig().TempMusic)
-        self.petService.writeMusicLog(keyword,name)
+        try:
+            musicID,name = self.service.getMusicID(keyword)
+            musicURL = self.service.getMusicURL(musicID)
+            data = downloadURLRes(musicURL)
+            saveTofile(data,GlobalConfig().TempMusic)
+            self.musicToFileSignal.emit()
+            info = self.petService.writeMusicLog(keyword,name)
+            self.infoSolve(info)
+        except Exception as e:
+            self.exceptionSolve(e,OptionTypeEnum.MUSIC)
 
     def getRandomPicToFile(self):
         url,data = self.service.getRandomPicture()
