@@ -24,6 +24,7 @@ class DialogBox(QFrame):
         self.timeTimer = QTimer()
         self.timeTimer.timeout.connect(self.timeoutFunc)
         self.state = 1
+        self.isOK = True
 
         self.label = QLabel(content)
         # 占据父组件的全部宽度
@@ -45,6 +46,7 @@ class DialogBox(QFrame):
         self.timer = QTimer()
         self.state = 1
         self.currentIndex = 0
+        self.isOK = True
         self.label.setText("")
         self.index = 0
         self.text = text
@@ -52,11 +54,13 @@ class DialogBox(QFrame):
         self.timer.start(100)
         if time != 0:
             self.timeTimer.start(time*1000)
+            self.isOK = False
 
     def timeoutFunc(self):
         self.timer.stop()
         self.timeTimer.stop()
         self.label.setText("（[error] 响应超时，请检查错误日志）")
+        self.isOK = True
 
     def showNextCharacter(self,loop=False):
         if self.currentIndex >= len(self.text):
@@ -82,12 +86,12 @@ class DialogBox(QFrame):
         return line_count
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton and self.state == 0:
+        if event.button() == Qt.MouseButton.LeftButton and self.state == 0 and self.isOK:
             self.timer.start(100)
             self.index = self.currentIndex
             self.label.setText("")
             self.state = 1
-        else:
+        elif self.isOK:
             self.hideSignal.emit()
 
     def _initQss(self):

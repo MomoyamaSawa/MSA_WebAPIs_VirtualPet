@@ -100,9 +100,11 @@ class MainWindow(QWidget):
     def leftTap(self):
         randomNumber = random.random()
         if randomNumber < 0.8 :
-            asyncio.run(self.app.getSingle())
+            f = FunctionRunnable(self.app.getSingle)
+            self.threadPool.start(f)
         else:
-            asyncio.run(self.app.getTimeAndWeather())
+            f = FunctionRunnable(self.app.getTimeAndWeather)
+            self.threadPool.start(f)
 
     def rightTap(self):
         """
@@ -181,12 +183,6 @@ class MainWindow(QWidget):
         self.showWaitMsg()
 
     def showFromBox(self,title,content,options=None):
-        # if self.dialog.isVisible():
-        #     self.dialog.hide()
-        # if self.frombox is not None:
-        #     self.frombox.hide()
-        #     self.frombox.deleteLater()
-        #     self.frombox = None
         self.frombox = FromBox(title,content,options)
         self.stateMa.setState(FromBoxState(self.frombox))
         return self.frombox
@@ -214,11 +210,18 @@ class MainWindow(QWidget):
         # 下面两句话的先后顺序有要求
         self.setLeftTapOK(False)
         self.leftTapTimer.stop()
-        self.dialog.hideSignal.connect(lambda :self.setLeftTapOK(True))
+        self.dialog.hideSignal.connect(self._setHideSlot)
+
+    @pyqtSlot()
+    def _setHideSlot(self):
+        self.dialog.hideSignal.disconnect(self._setHideSlot)
+        self.setLeftTapOK(True)
 
     def showWaitMsg(self):
         self.stateMa.setState(DialogState(self.dialog))
         self.dialog.printLoopDialog(GlobalConfig().PetName + "思考中.....",GlobalConfig().Timeout)
+        self.setLeftTapOK(False)
+        self.leftTapTimer.stop()
 
     def tr(self):
         frombox = self.showFromBox("翻译","请输入要翻译的文本",[languageOptions])

@@ -74,19 +74,19 @@ class PetApplication(QObject):
         self.petService.writeInfoFromImageLog(filePath,name,work)
 
     def getGPT(self,msg) -> str:
-        # try:
+        try:
             # 得到之前的n个前置
             logs = self.petService.getGPTLogs(GlobalConfig().WebAPI["GPT"]["Num"])
             ans =  self.service.getGPT(msg,logs)
             self.gptSignal.emit(ans)
             info = self.petService.writeGPTLog(msg,ans)
             self.infoSolve(info)
-        # except Exception as e:
-        #     self.exceptionSolve(e,OptionTypeEnum.GPT)
+        except Exception as e:
+            self.exceptionSolve(e,OptionTypeEnum.GPT)
 
-    async def getSingle(self)->str:
+    def getSingle(self):
         try:
-            dto = await self.service.getSingleSentance()
+            dto = self.service.getSingleSentance()
             if dto.who:
                 self.singleSentanceSignal.emit(f"{dto.content}        ----{dto.where}（{dto.who}）")
             else:
@@ -96,11 +96,11 @@ class PetApplication(QObject):
         except Exception as e:
             self.exceptionSolve(e,OptionTypeEnum.SINGLE)
 
-    async def getTimeAndWeather(self) -> str:
+    def getTimeAndWeather(self):
         try:
             # TODO 这边是直接获取本地时间了，有精力再改改把
             timeDTO = self.service.getTime()
-            wheatherDTO = await self.service.getWeather()
+            wheatherDTO = self.service.getWeather()
             self.wheatherSignal.emit(f"今天是{timeDTO.year}年{timeDTO.month}月{timeDTO.day}日{WeekDayEnumArr[int(timeDTO.weekDay)]}，天气为{wheatherDTO.weather}，温度{wheatherDTO.temperature}℃，湿度{wheatherDTO.humidity}%，风速{wheatherDTO.windPower}m/s")
             info = self.petService.writeTimeAndWeatherLog(timeDTO.year,timeDTO.month,timeDTO.day,WeekDayEnumArr[int(timeDTO.weekDay)],wheatherDTO.weather,wheatherDTO.temperature,wheatherDTO.humidity,wheatherDTO.windPower)
             self.infoSolve(info)

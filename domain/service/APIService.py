@@ -24,15 +24,15 @@ class APIService:
         currentTime = datetime.now()
         return TimeDto(currentTime.year, currentTime.month, currentTime.day, currentTime.hour, currentTime.weekday())
 
-    async def getWeather(self) -> WeatherDto:
+    def getWeather(self) -> WeatherDto:
         """
         获得天气
         https://lbs.amap.com/api/webservice/guide/api/weatherinfo
         """
         url = self.config.WebAPI["GetWeather"]["URL"]
         params = self.config.WebAPI["GetWeather"]["Params"]
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url, params=params)
+        with httpx.Client() as client:
+            response = client.get(url, params=params)
             response.raise_for_status()
         data = response.json()
         return WeatherDto(data['lives'][0]['weather'], data['lives'][0]['temperature'], data['lives'][0]['winddirection'], data['lives'][0]['windpower'], data['lives'][0]['humidity'], data['lives'][0]['reporttime'])
@@ -70,7 +70,7 @@ class APIService:
         response = requests.get(url)
         return url,response.content
 
-    async def getSingleSentance(self) -> SentanceDataDto:
+    def getSingleSentance(self) -> SentanceDataDto:
         """
         获得随机的语句
         https://developer.hitokoto.cn/sentence/
@@ -79,8 +79,8 @@ class APIService:
         value = random.sample(list(HitokotoTypeEnum), 1)
         # 随机来一个分类
         params = {'c': value[0].value}
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url, params=params)
+        with httpx.Client() as client:
+            response = client.get(url, params=params)
             response.raise_for_status()
         data = response.json()
         return SentanceDataDto(data['from'], data['from_who'], data['hitokoto'])
