@@ -12,6 +12,7 @@ import shutil,asyncio,random
 from util.live2D import *
 from common.AIDrawType import *
 from common.LanguageType import *
+from util.showCon import *
 
 class MainWindow(QWidget):
     """
@@ -34,6 +35,7 @@ class MainWindow(QWidget):
         self.dialog = CharacterDialogBox(GlobalConfig().PetName)
         self.dialog.hide()
         self.frombox = None
+        self.stateMa = ShowWinStateMachine(self)
 
         self.dll = None
         self.timer = QTimer(self)
@@ -60,6 +62,9 @@ class MainWindow(QWidget):
 
     def setLeftTapOK(self,flag):
         self.isLeftTapOK = flag
+        if not flag:
+            self.leftTapTimer.stop()
+            self.leftTapTimer.start()
 
     @pyqtSlot()
     def initLive2d(self):
@@ -69,13 +74,10 @@ class MainWindow(QWidget):
     def updateFrom(self):
         if self.dll is not None and isOK(self.dll):
             x, y = getPos(self.dll)
-            width = self.width()
-            height = self.height()
-            self.move(x - width // 2, y - height // 2)
+            self.move(x - self.width() // 2, y - self.height() // 2)
             if isLeftTouched(self.dll) and self.isLeftTapOK:
                 self.leftTap()
-                self.isLeftTapOK = False
-                self.leftTapTimer.start()
+                self.setLeftTapOK(False)
             if isRightTouched(self.dll):
                 self.rightTap()
 
@@ -87,10 +89,10 @@ class MainWindow(QWidget):
         """)
 
     def leftTap(self):
-        if self.frombox is not None:
-            self.frombox.hide()
-            self.frombox.deleteLater()
-            self.frombox = None
+        # if self.frombox is not None:
+        #     self.frombox.hide()
+        #     self.frombox.deleteLater()
+        #     self.frombox = None
         randomNumber = random.random()
         if randomNumber < 0.75 :
             self.showMsg(self.app.getSingle())
@@ -173,15 +175,18 @@ class MainWindow(QWidget):
         self.showMsg(msg)
 
     def showFromBox(self,title,content,options=None):
-        if self.dialog.isVisible():
-            self.dialog.hide()
-        if self.frombox is not None:
-            self.frombox.hide()
-            self.frombox.deleteLater()
-            self.frombox = None
+        # if self.dialog.isVisible():
+        #     self.dialog.hide()
+        # if self.frombox is not None:
+        #     self.frombox.hide()
+        #     self.frombox.deleteLater()
+        #     self.frombox = None
         self.frombox = FromBox(title,content,options)
-        self.hboxLayout.addWidget(self.frombox,0,Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignCenter)
+        self.stateMa.setState(FromBoxState(self.frombox))
         return self.frombox
+
+    def viewLayAddShowW(self,view):
+        self.hboxLayout.addWidget(view,0,Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignCenter)
 
     def randomMusic(self):
         title,author = self.app.getRandomMusic()
@@ -195,7 +200,7 @@ class MainWindow(QWidget):
         asyncio.run(self.app.getInfoFromImage(file))
 
     def showMsg(self,msg):
-        self.dialog.show()
+        self.stateMa.setState(DialogState(self.dialog))
         self.dialog.printDialog(msg)
 
     def tr(self):
@@ -210,7 +215,6 @@ class MainWindow(QWidget):
     def showHistoryOntoday(self):
         day,content = self.app.getHistoryOnToday()
         self.showMsg(f"{day}，{content}")
-
 
     def showRandomPic(self):
         self.app.getRandomPicToFile()
