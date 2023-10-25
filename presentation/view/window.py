@@ -64,6 +64,10 @@ class MainWindow(QWidget):
         self.app.gptSignal.connect(self.showMainMsg)
         self.app.musicToFileSignal.connect(self._playMusicFromFile)
         self.app.musicToFileSignal.connect(self.stopLoopMsg)
+        self.app.randomMusicSiganl.connect(self._randomMusic)
+        self.app.randomPicSignal.connect(self.showPicTip)
+        self.app.randomPicSignal.connect(self.stopLoopMsg)
+
 
     def _initLayout(self):
         self.setLayout(self.hboxLayout)
@@ -192,10 +196,13 @@ class MainWindow(QWidget):
         self.hboxLayout.addWidget(view,0,Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignCenter)
 
     def randomMusic(self):
-        title,author = self.app.getRandomMusic()
-        self.player.setSource(QUrl.fromLocalFile(GlobalConfig().TempMusic))
-        self.player.play()
-        self.showMsg(f"正在播放：{title}，作者：{author}")
+        f = FunctionRunnable(self.app.getRandomMusic)
+        self.threadPool.start(f)
+        self.showWaitMsg("挑选中.....")
+
+    def _randomMusic(self,title,author):
+        self._playMusicFromFile()
+        self.showMainMsg(f"正在播放：{title}，作者：{author}")
 
     def search(self):
         # 打开文件选择对话框
@@ -238,8 +245,9 @@ class MainWindow(QWidget):
         self.showMsg(f"{day}，{content}")
 
     def showRandomPic(self):
-        self.app.getRandomPicToFile()
-        self.showPicTip()
+        f = FunctionRunnable(self.app.getRandomPicToFile)
+        self.threadPool.start(f)
+        self.showWaitMsg("挑选中.....")
 
     def showWiki(self):
         frombox = self.showFromBox("wiki","请输入关键字")

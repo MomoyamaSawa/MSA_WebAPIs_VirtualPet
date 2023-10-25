@@ -56,10 +56,10 @@ class APIService:
         getURL = self.config.WebAPI["Music"]["Get"]["URL"]
         getParams = self.config.WebAPI["Music"]["Get"]["Params"]
         getParams['id'] = id
-        response = requests.get(getURL, params=getParams)
+        with httpx.Client() as client:
+            response = client.get(getURL, params=getParams)
+            response.raise_for_status()
         data = response.json()
-        if (response.status_code != 200):
-            raise WebAPIException(response.status_code, response.text)
         musicURL = data['data'][0]['url']
         return musicURL
 
@@ -68,7 +68,9 @@ class APIService:
         获得随机图片的数据
         """
         url = self.config.WebAPI["Picture"]["URL"]
-        response = requests.get(url)
+        with httpx.Client() as client:
+            response = client.get(url)
+            response.raise_for_status()
         return url,response.content
 
     def getSingleSentance(self) -> SentanceDataDto:
@@ -160,7 +162,9 @@ class APIService:
         """
         url = self.config.WebAPI["Music"]["Random"]["URL"]
         params = self.config.WebAPI["Music"]["Random"]["Params"]
-        response = requests.get(url, params=params)
+        with httpx.Client() as client:
+            response = client.get(url, params=params)
+            response.raise_for_status()
         data = response.json()
         return RandomMusicDto(data['id'],data['title'],data['artist'],data['cover'])
 

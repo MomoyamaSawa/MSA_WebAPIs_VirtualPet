@@ -48,6 +48,7 @@ class PetService():
         }
         optionLogAgg = OptionLogAgg(OptionTypeEnum.RANDOM_MUSIC,musicLog)
         optionLogAgg.writeOptionLog()
+        return str(optionLogAgg)
 
     def writeRandomPicLog(self,url):
         picLog = {
@@ -55,6 +56,7 @@ class PetService():
         }
         optionLogAgg = OptionLogAgg(OptionTypeEnum.RANDOM_PIC,picLog)
         optionLogAgg.writeOptionLog()
+        return str(optionLogAgg)
 
     def writeInfoFromImageLog(self,path,name,work):
         infoLog = {

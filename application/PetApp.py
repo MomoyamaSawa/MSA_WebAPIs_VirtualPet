@@ -15,6 +15,8 @@ class PetApplication(QObject):
     wheatherSignal = pyqtSignal(str)
     gptSignal = pyqtSignal(str)
     musicToFileSignal = pyqtSignal()
+    randomMusicSiganl = pyqtSignal(str,str)
+    randomPicSignal = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -35,9 +37,15 @@ class PetApplication(QObject):
             self.exceptionSolve(e,OptionTypeEnum.MUSIC)
 
     def getRandomPicToFile(self):
-        url,data = self.service.getRandomPicture()
-        saveTofile(data,GlobalConfig().TempPic)
-        self.petService.writeRandomPicLog(url)
+        try:
+            url,data = self.service.getRandomPicture()
+            saveTofile(data,GlobalConfig().TempPic)
+            self.randomPicSignal.emit()
+            info = self.petService.writeRandomPicLog(url)
+            self.infoSolve(info)
+        except Exception as e:
+            self.exceptionSolve(e,OptionTypeEnum.RANDOM_PIC)
+
 
     def getWiki(self,keyword) -> str:
         contents = self.service.getWikiSearch(keyword)
@@ -54,12 +62,16 @@ class PetApplication(QObject):
         return content.day, content.content
 
     def getRandomMusic(self) -> (str,str):
-        musicData = self.service.getRandomMusic()
-        url = self.service.getMusicURL(musicData.id)
-        data = downloadURLRes(url)
-        saveTofile(data,GlobalConfig().TempMusic)
-        self.petService.writeRandomMusicLog(musicData.title,musicData.author)
-        return musicData.title,musicData.author
+        try:
+            musicData = self.service.getRandomMusic()
+            url = self.service.getMusicURL(musicData.id)
+            data = downloadURLRes(url)
+            saveTofile(data,GlobalConfig().TempMusic)
+            self.randomMusicSiganl.emit(musicData.title,musicData.author)
+            info = self.petService.writeRandomMusicLog(musicData.title,musicData.author)
+            self.infoSolve(info)
+        except Exception as e:
+            self.exceptionSolve(e,OptionTypeEnum.RANDOM_MUSIC)
 
     def getTr(self,msg,to) -> str:
         if len(msg) < 5:
