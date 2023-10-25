@@ -6,7 +6,7 @@ from util.config import GlobalConfig
 from qfluentwidgets import *
 from qfluentwidgets import FluentIcon as FIF
 from application.PetApp import PetApplication
-from presentation.component.customMsgBox import *
+from presentation.component.fromBox import *
 from presentation.component.dialogBox import CharacterDialogBox
 import shutil,asyncio,random
 from util.live2D import *
@@ -202,6 +202,11 @@ class MainWindow(QWidget):
     def showMsg(self,msg):
         self.stateMa.setState(DialogState(self.dialog))
         self.dialog.printDialog(msg)
+
+    def showMainMsg(self,msg):
+        self.showMsg(msg)
+        self.leftTapTimer.stop()
+        self.dialog.hideSignal.connect(lambda :self.setLeftTapOK(True))
 
     def tr(self):
         frombox = self.showFromBox("翻译","请输入要翻译的文本",[languageOptions])
