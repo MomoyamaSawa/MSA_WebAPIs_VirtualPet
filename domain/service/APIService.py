@@ -177,7 +177,9 @@ class APIService:
         params = self.config.WebAPI["Translation"]["Params"]
         params['msg'] = msg
         params['to'] = to.value
-        response = requests.get(url, params=params)
+        with httpx.Client() as client:
+            response = client.get(url, params=params)
+            response.raise_for_status()
         data = response.json()
         return data["msg"]
 
@@ -189,7 +191,9 @@ class APIService:
         params = self.config.WebAPI["Wiki"]["Params"]
         params.update(self.config.WebAPI["Wiki"]["SearchParams"])
         params['srsearch'] = keyword
-        response = requests.get(url, params=params)
+        with httpx.Client() as client:
+            response = client.get(url, params=params)
+            response.raise_for_status()
         data = response.json()
         results = []
         for item in data['query']['search']:
@@ -204,7 +208,9 @@ class APIService:
         params = self.config.WebAPI["Wiki"]["Params"]
         params.update(self.config.WebAPI["Wiki"]["GetParams"])
         params['pageids'] = id
-        response = requests.get(url, params=params)
+        with httpx.Client() as client:
+            response = client.get(url, params=params)
+            response.raise_for_status()
         data = response.json()
         return WikiDetailDto(data['query']['pages'][f'{id}']['title'],data['query']['pages'][f'{id}']['extract'])
 

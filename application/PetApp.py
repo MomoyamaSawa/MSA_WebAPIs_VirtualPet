@@ -18,6 +18,8 @@ class PetApplication(QObject):
     randomMusicSiganl = pyqtSignal(str,str)
     randomPicSignal = pyqtSignal()
     drawAISiganl = pyqtSignal()
+    trSignal = pyqtSignal(str)
+    wikiSignal = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
@@ -48,12 +50,16 @@ class PetApplication(QObject):
             self.exceptionSolve(e,OptionTypeEnum.RANDOM_PIC)
 
 
-    def getWiki(self,keyword) -> str:
-        contents = self.service.getWikiSearch(keyword)
-        id = contents.contents[0].pageid
-        context = self.service.getWikiDetail(id)
-        self.petService.writeWikiLog(keyword,context.title,context.content)
-        return f"{context.content}"
+    def getWiki(self,keyword):
+        try:
+            contents = self.service.getWikiSearch(keyword)
+            id = contents.contents[0].pageid
+            context = self.service.getWikiDetail(id)
+            self.wikiSignal.emit(context.content)
+            info = self.petService.writeWikiLog(keyword,context.title,context.content)
+            self.infoSolve(info)
+        except Exception as e:
+            self.exceptionSolve(e,OptionTypeEnum.WIKI)
 
     def getHistoryOnToday(self) -> (str,str):
         data = self.service.getHistoryOnToday()
@@ -74,12 +80,16 @@ class PetApplication(QObject):
         except Exception as e:
             self.exceptionSolve(e,OptionTypeEnum.RANDOM_MUSIC)
 
-    def getTr(self,msg,to) -> str:
-        if len(msg) < 5:
-            return "文本过短，无法翻译"
-        ans = self.service.getTr(msg,LanguageTypeEnum(to))
-        self.petService.writeTrLog(msg,ans,to)
-        return ans
+    def getTr(self,msg,to):
+        try:
+            if len(msg) < 5:
+                return "文本过短，无法翻译"
+            ans = self.service.getTr(msg,LanguageTypeEnum(to))
+            self.trSignal.emit(ans)
+            info = self.petService.writeTrLog(msg,ans,to)
+            self.infoSolve(info)
+        except Exception as e:
+            self.exceptionSolve(e,OptionTypeEnum.TR)
 
     def drawAI(self,content,style,radio):
         try:

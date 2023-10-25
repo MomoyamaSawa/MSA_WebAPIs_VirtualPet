@@ -8,7 +8,7 @@ from qfluentwidgets import FluentIcon as FIF
 from application.PetApp import PetApplication
 from presentation.component.fromBox import *
 from presentation.component.dialogBox import CharacterDialogBox
-import shutil,asyncio,random
+import shutil,random
 from util.live2D import *
 from common.AIDrawType import *
 from common.LanguageType import *
@@ -69,6 +69,8 @@ class MainWindow(QWidget):
         self.app.randomPicSignal.connect(self.stopLoopMsg)
         self.app.drawAISiganl.connect(self.showPicTip)
         self.app.drawAISiganl.connect(self.stopLoopMsg)
+        self.app.trSignal.connect(self.showMainMsg)
+        self.app.wikiSignal.connect(self.showMainMsg)
 
 
     def _initLayout(self):
@@ -242,8 +244,9 @@ class MainWindow(QWidget):
 
     def _tr(self,keyword,index):
         # 去除“To ”
-        msg = self.app.getTr(keyword,languageOptions[index[0]][3:])
-        self.showMsg(msg)
+        f = FunctionRunnable(self.app.getTr,keyword,languageOptions[index[0]][3:])
+        self.threadPool.start(f)
+        self.showWaitMsg("翻译中.....")
 
     def showHistoryOntoday(self):
         day,content = self.app.getHistoryOnToday()
@@ -259,8 +262,8 @@ class MainWindow(QWidget):
         frombox.fromContentSignal.connect(self._showWiki)
 
     def _showWiki(self,keyword):
-        msg = self.app.getWiki(keyword)
-        self.showMsg(msg)
+        f = FunctionRunnable(self.app.getWiki,keyword)
+        self.threadPool.start(f)
 
     def showPicTip(self):
         position = TeachingTipTailPosition.RIGHT

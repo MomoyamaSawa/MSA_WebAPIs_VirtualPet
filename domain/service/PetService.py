@@ -77,6 +77,7 @@ class PetService():
         }
         optionLogAgg = OptionLogAgg(OptionTypeEnum.AI_DRAW,aiDrawLog)
         optionLogAgg.writeOptionLog()
+        return str(optionLogAgg)
 
     def writeTrLog(self,msg,ans,to):
         trLog = {
@@ -86,6 +87,7 @@ class PetService():
         }
         optionLogAgg = OptionLogAgg(OptionTypeEnum.TR,trLog)
         optionLogAgg.writeOptionLog()
+        return str(optionLogAgg)
 
     def writeWikiLog(self,keyword,title,content):
         wikiLog = {
@@ -95,6 +97,7 @@ class PetService():
         }
         optionLogAgg = OptionLogAgg(OptionTypeEnum.WIKI,wikiLog)
         optionLogAgg.writeOptionLog()
+        return str(optionLogAgg)
 
     def writeHistoryLog(self,day,content):
         historyLog = {
