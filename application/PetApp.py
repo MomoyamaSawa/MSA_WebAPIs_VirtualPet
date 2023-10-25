@@ -17,6 +17,7 @@ class PetApplication(QObject):
     musicToFileSignal = pyqtSignal()
     randomMusicSiganl = pyqtSignal(str,str)
     randomPicSignal = pyqtSignal()
+    drawAISiganl = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -80,16 +81,25 @@ class PetApplication(QObject):
         self.petService.writeTrLog(msg,ans,to)
         return ans
 
-    def drawAI(self,content,style,radio) -> str:
-        url = self.service.getAIDraw(content,AIDrawStyleEnum(style),AIDrawRatioEnum(radio))
-        data = downloadURLRes(url)
-        saveTofile(data,GlobalConfig().TempPic)
-        self.petService.writeAIDrawLog(content,style,radio,url)
+    def drawAI(self,content,style,radio):
+        try:
+            url = self.service.getAIDraw(content,AIDrawStyleEnum(style),AIDrawRatioEnum(radio))
+            data = downloadURLRes(url)
+            saveTofile(data,GlobalConfig().TempPic)
+            self.drawAISiganl.emit()
+            info = self.petService.writeAIDrawLog(content,style,radio,url)
+            self.infoSolve(info)
+        except Exception as e:
+            self.exceptionSolve(e,OptionTypeEnum.AI_DRAW)
 
-    async def getInfoFromImage(self,filePath) -> str:
-        name,work = await self.service.getInfoFromImage(filePath)
-        self.getInfoFromImageSignal.emit(f"这是{work}的{name}")
-        self.petService.writeInfoFromImageLog(filePath,name,work)
+    def getInfoFromImage(self,filePath):
+        try:
+            name,work = self.service.getInfoFromImage(filePath)
+            self.getInfoFromImageSignal.emit(f"这是{work}的{name}")
+            log = self.petService.writeInfoFromImageLog(filePath,name,work)
+            self.infoSolve(log)
+        except Exception as e:
+            self.exceptionSolve(e,OptionTypeEnum.INFO_FROM_IMAGE)
 
     def getGPT(self,msg) -> str:
         try:

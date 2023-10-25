@@ -141,16 +141,16 @@ class APIService:
             contents.append(HistoryOnTodayItem(item["date"],item["title"]))
         return HistoryOnTodayDto(day,contents)
 
-    async def getInfoFromImage(self,filePath) -> (str,str):
+    def getInfoFromImage(self,filePath) -> (str,str):
         """
         TODO 图像识别出动漫，之后加一点识别是否为AI图，还有识别的是动漫还是gal的参数进去吧
         """
         url = self.config.WebAPI["InfoFromImage"]["URL"]
         files = {'image': open(filePath, 'rb')}
         params = self.config.WebAPI["InfoFromImage"]["Params"]
-        async with httpx.AsyncClient() as client:
+        with httpx.Client() as client:
             # only httpx 不知道为什么用request防火墙会拦
-            response = await client.post(url, files=files, params=params)
+            response = client.post(url, files=files, params=params)
             response.raise_for_status()
         data = response.json()
         return data["data"][0]['name'],data["data"][0]['cartoonname']
@@ -241,7 +241,7 @@ class APIService:
         data = response.json()
         return data['choices'][0]['message']['content']
 
-    def getAIDraw(self,txt,style: AIDrawStyleEnum,radio: AIDrawRatioEnum) -> AIDrawDto:
+    def getAIDraw(self,txt,style: AIDrawStyleEnum,radio: AIDrawRatioEnum):
         """
         AI画画
         """
@@ -250,6 +250,8 @@ class APIService:
         params['imgTxt'] = txt
         params['style'] = style.value
         params['ratio'] = radio.value
-        response = requests.post(url, data=params)
+        with httpx.Client() as client:
+            response = client.post(url, data=params)
+            response.raise_for_status()
         data = response.json()
         return data['data']['result']['img']

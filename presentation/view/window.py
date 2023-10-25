@@ -67,6 +67,8 @@ class MainWindow(QWidget):
         self.app.randomMusicSiganl.connect(self._randomMusic)
         self.app.randomPicSignal.connect(self.showPicTip)
         self.app.randomPicSignal.connect(self.stopLoopMsg)
+        self.app.drawAISiganl.connect(self.showPicTip)
+        self.app.drawAISiganl.connect(self.stopLoopMsg)
 
 
     def _initLayout(self):
@@ -173,9 +175,10 @@ class MainWindow(QWidget):
         frombox = self.showFromBox("AI绘画","请输入图片关键字",[AIOptionsStyle,AIOptionsRatio])
         frombox.fromContentSignal.connect(self._draw)
 
+    @pyqtSlot(str,list)
     def _draw(self,content,index):
-        self.app.drawAI(content,AIOptionsStyle[index[0]],AIOptionsRatio[index[1]])
-        self.showPicTip()
+        f = FunctionRunnable(self.app.drawAI,content,AIOptionsStyle[index[0]],AIOptionsRatio[index[1]])
+        self.threadPool.start(f)
 
     def gpt(self):
         frombox = self.showFromBox("GPT猫娘","请输入对话内容")
@@ -207,7 +210,9 @@ class MainWindow(QWidget):
     def search(self):
         # 打开文件选择对话框
         file, _ = QFileDialog.getOpenFileName(self, "选择图片文件", "", "Image Files (*.png *.jpg)")
-        asyncio.run(self.app.getInfoFromImage(file))
+        f = FunctionRunnable(self.app.getInfoFromImage,file)
+        self.threadPool.start(f)
+        self.showWaitMsg("识别中.....")
 
     def showMsg(self,msg):
         self.stateMa.setState(DialogState(self.dialog))

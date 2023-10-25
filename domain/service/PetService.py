@@ -66,6 +66,7 @@ class PetService():
         }
         optionLogAgg = OptionLogAgg(OptionTypeEnum.INFO_FROM_IMAGE,infoLog)
         optionLogAgg.writeOptionLog()
+        return str(optionLogAgg)
 
     def writeAIDrawLog(self,content,style,radio,url):
         aiDrawLog = {
