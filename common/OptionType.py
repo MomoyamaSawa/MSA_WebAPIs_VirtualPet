@@ -13,4 +13,5 @@ class OptionTypeEnum(Enum):
     SINGLE = "SINGLE"
     TIME_AND_WEATHER = "TIME_AND_WEATHER"
     MUSIC_LIST = "MUSIC_LIST"
+    WIKI_LIST = "WIKI_LIST"
 

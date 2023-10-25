@@ -270,7 +270,7 @@ class APIService:
         params['style'] = style.value
         params['ratio'] = radio.value
         with httpx.Client() as client:
-            response = client.post(url, data=params)
+            response = client.post(url, data=params,timeout=50)
             response.raise_for_status()
         data = response.json()
         return data['data']['result']['img']

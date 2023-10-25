@@ -19,6 +19,7 @@ class PetApplication(QObject):
     randomPicSignal = pyqtSignal()
     drawAISiganl = pyqtSignal()
     trSignal = pyqtSignal(str)
+    searchWikiSignal = pyqtSignal(list)
     wikiSignal = pyqtSignal(str)
     historyTodaySignal = pyqtSignal(str)
     musicListSignal = pyqtSignal(list)
@@ -38,10 +39,6 @@ class PetApplication(QObject):
             self.exceptionSolve(e,OptionTypeEnum.MUSIC)
 
     def getMusicToFile(self,id,content):
-        musicURL = self.service.getMusicURL(id)
-        data = downloadURLRes(musicURL)
-        saveTofile(data,GlobalConfig().TempMusic)
-        self.musicToFileSignal.emit(content)
         try:
             musicURL = self.service.getMusicURL(id)
             data = downloadURLRes(musicURL)
@@ -62,13 +59,20 @@ class PetApplication(QObject):
         except Exception as e:
             self.exceptionSolve(e,OptionTypeEnum.RANDOM_PIC)
 
-    def getWiki(self,keyword):
+    def searchWiki(self,keyword):
         try:
             contents = self.service.getWikiSearch(keyword)
-            id = contents.contents[0].pageid
+            self.searchWikiSignal.emit(contents.contents)
+            info = self.petService.writeWikiSearchLog(keyword)
+            self.infoSolve(info)
+        except Exception as e:
+            self.exceptionSolve(e,OptionTypeEnum.WIKI)
+
+    def getWikiDetail(self,id):
+        try:
             context = self.service.getWikiDetail(id)
             self.wikiSignal.emit(context.content)
-            info = self.petService.writeWikiLog(keyword,context.title,context.content)
+            info = self.petService.writeWikiLog(id,context.title,context.content)
             self.infoSolve(info)
         except Exception as e:
             self.exceptionSolve(e,OptionTypeEnum.WIKI)

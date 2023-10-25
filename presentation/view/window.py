@@ -73,6 +73,7 @@ class MainWindow(QWidget):
         self.app.drawAISiganl.connect(self.showPicTip)
         self.app.drawAISiganl.connect(self.stopLoopMsg)
         self.app.trSignal.connect(self.showMainMsg)
+        self.app.searchWikiSignal.connect(self.showWiki)
         self.app.wikiSignal.connect(self.showMainMsg)
         self.app.historyTodaySignal.connect(self.showMainMsg)
         self.app.musicListSignal.connect(self._selectMusic)
@@ -155,15 +156,15 @@ class MainWindow(QWidget):
 
         wiki = Action(FIF.BOOK_SHELF, '维基百科')
         view.addAction(wiki)
-        wiki.triggered.connect(self.showWiki)
+        wiki.triggered.connect(self.searchWiki)
 
         history = Action(FIF.HISTORY, '历史上今天的事')
         view.addAction(history)
         history.triggered.connect(self.showHistoryOntoday)
 
-        stopMusic = Action(FIF.PAUSE, '停止音乐')
-        view.addHiddenAction(stopMusic)
-        stopMusic.triggered.connect(self.stopMusic)
+        # stopMusic = Action(FIF.PAUSE, '停止音乐')
+        # view.addHiddenAction(stopMusic)
+        # stopMusic.triggered.connect(self.stopMusic)
 
         view.addHiddenAction(Action(FIF.SETTING, '设置'))
 
@@ -228,6 +229,7 @@ class MainWindow(QWidget):
     def _randomMusic(self,title,author):
         self._playMusicFromFile()
         self.showMainMsg(f"正在播放：{title}，作者：{author}")
+        self.showOptionTip("音乐播放中~",f"正在播放：{title}，作者：{author}")
 
     def search(self):
         # 打开文件选择对话框
@@ -277,12 +279,26 @@ class MainWindow(QWidget):
         self.threadPool.start(f)
         self.showWaitMsg("挑选中.....")
 
-    def showWiki(self):
+    def searchWiki(self):
         frombox = self.showFromBox("wiki","请输入关键字")
-        frombox.fromContentSignal.connect(self._showWiki)
+        frombox.fromContentSignal.connect(self._searchWiki)
 
-    def _showWiki(self,keyword):
-        f = FunctionRunnable(self.app.getWiki,keyword)
+    def _searchWiki(self,keyword):
+        f = FunctionRunnable(self.app.searchWiki,keyword)
+        self.threadPool.start(f)
+        self.showWaitMsg("查询中.....")
+
+    def showWiki(self,contents):
+        indexs = []
+        values = []
+        for item in contents:
+            indexs.append(str(item.pageid))
+            values.append(item.title)
+        frombox = self.showFromSelectBox("选择条目",indexs,values)
+        frombox.fromSelectSignal.connect(self._showWiki)
+
+    def _showWiki(self,id):
+        f = FunctionRunnable(self.app.getWikiDetail,id)
         self.threadPool.start(f)
         self.showWaitMsg("查询中.....")
 
@@ -351,6 +367,7 @@ class MainWindow(QWidget):
     def selectMusic(self,keyword):
         f = FunctionRunnable(self.app.getMusicList,keyword)
         self.threadPool.start(f)
+        self.showWaitMsg("查询中.....")
 
     def _selectMusic(self,items):
         indexs = []
@@ -366,6 +383,7 @@ class MainWindow(QWidget):
         self.stopMusic()
         f = FunctionRunnable(self.app.getMusicToFile,id,content)
         self.threadPool.start(f)
+        self.showWaitMsg("查询中.....")
 
     @pyqtSlot(str)
     def _playMusicFromFile(self,content = ""):

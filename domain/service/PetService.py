@@ -13,8 +13,8 @@ class PetService():
         写入GPT日志
         """
         gptLog = {
-            "问题":q,
-            "回答":a
+            "question":q,
+            "ans":a
         }
         optionLogAgg = OptionLogAgg(OptionTypeEnum.GPT,gptLog)
         optionLogAgg.writeOptionLog()
@@ -28,13 +28,13 @@ class PetService():
         logs = []
         for agg in aggs:
             dt = fromDateTimeToStr(agg.time)
-            log = GptLogItem(agg.content["问题"],agg.content["回答"],dt)
+            log = GptLogItem(agg.content["question"],agg.content["ans"],dt)
             logs.append(log)
         return list(reversed(logs))
 
     def writeMusicLog(self,content):
         musicLog = {
-            "信息":content,
+            "info":content,
         }
         optionLogAgg = OptionLogAgg(OptionTypeEnum.MUSIC,musicLog)
         optionLogAgg.writeOptionLog()
@@ -42,8 +42,8 @@ class PetService():
 
     def writeRandomMusicLog(self,title,author):
         musicLog = {
-            "标题":title,
-            "作者":author
+            "title":title,
+            "author":author
         }
         optionLogAgg = OptionLogAgg(OptionTypeEnum.RANDOM_MUSIC,musicLog)
         optionLogAgg.writeOptionLog()
@@ -141,5 +141,13 @@ class PetService():
             "keyword":keyword
         }
         optionLogAgg = OptionLogAgg(OptionTypeEnum.MUSIC_LIST,musicListLog)
+        optionLogAgg.writeOptionLog()
+        return str(optionLogAgg)
+
+    def writeWikiSearchLog(self,keyword):
+        wikiListLog = {
+            "keyword":keyword
+        }
+        optionLogAgg = OptionLogAgg(OptionTypeEnum.WIKI_LIST,wikiListLog)
         optionLogAgg.writeOptionLog()
         return str(optionLogAgg)
