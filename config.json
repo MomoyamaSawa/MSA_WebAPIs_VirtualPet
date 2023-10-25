@@ -24,7 +24,7 @@
             "Search":{
                 "URL":"https://autumnfish.cn/cloudsearch",
                 "Params":{
-                    "limit":1,
+                    "limit":4,
                     "type":1
                 }
             },
@@ -124,7 +124,8 @@
     "Storage":"./storage/",
     "TempMusic":"./resource/temp/TempMusic",
     "TempPic":"./resource/temp/TempPic",
+    "InfoPic":"./resource/test.jpg",
     "PetName":"寧々",
     "Live2dPath":"./resource/live2d.dll",
-    "Timeout":10
+    "Timeout":20
 }

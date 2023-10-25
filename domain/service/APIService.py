@@ -52,6 +52,19 @@ class APIService:
         data = response.json()
         return data['result']['songs'][0]['id'],data['result']['songs'][0]['name']
 
+    def getMusicList(self,keyword) -> list[MusicListItemDto]:
+        searchURL = GlobalConfig().WebAPI["Music"]["Search"]["URL"]
+        searchParams = GlobalConfig().WebAPI["Music"]["Search"]["Params"]
+        searchParams['keywords'] = keyword
+        with httpx.Client() as client:
+            response = client.get(searchURL, params=searchParams)
+            response.raise_for_status()
+        data = response.json()
+        results = []
+        for item in data['result']['songs']:
+            results.append(MusicListItemDto(item['id'],item['name'],item['ar'][0]['name']))
+        return results
+
     def getMusicURL(self,id) -> (str,type):
         getURL = self.config.WebAPI["Music"]["Get"]["URL"]
         getParams = self.config.WebAPI["Music"]["Get"]["Params"]

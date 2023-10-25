@@ -145,6 +145,7 @@ class CharacterBox(QFrame):
 
 class CharacterDialogBox(QWidget):
     hideSignal = pyqtSignal()
+    stopLoopSignal = pyqtSignal()
     def __init__(self, name):
         super().__init__()
 
@@ -154,6 +155,7 @@ class CharacterDialogBox(QWidget):
         self.DialogBox = DialogBox("")
         self.characterBox = CharacterBox(name)
         self.DialogBox.hideSignal.connect(self.hide)
+        self.DialogBox.timeTimer.timeout.connect(self.stopLoopSignal.emit)
         self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
 
         self._setLayout()

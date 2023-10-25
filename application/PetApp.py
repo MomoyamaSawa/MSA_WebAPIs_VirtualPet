@@ -14,28 +14,40 @@ class PetApplication(QObject):
     singleSentanceSignal = pyqtSignal(str)
     wheatherSignal = pyqtSignal(str)
     gptSignal = pyqtSignal(str)
-    musicToFileSignal = pyqtSignal()
+    musicToFileSignal = pyqtSignal(str)
     randomMusicSiganl = pyqtSignal(str,str)
     randomPicSignal = pyqtSignal()
     drawAISiganl = pyqtSignal()
     trSignal = pyqtSignal(str)
     wikiSignal = pyqtSignal(str)
     historyTodaySignal = pyqtSignal(str)
+    musicListSignal = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
         self.service = APIService()
         self.petService = PetService()
 
-    def getMusicToFile(self,keyword):
-        # TODO 模糊搜索面板
+    def getMusicList(self,keyword):
         try:
-            musicID,name = self.service.getMusicID(keyword)
-            musicURL = self.service.getMusicURL(musicID)
+            list = self.service.getMusicList(keyword)
+            self.musicListSignal.emit(list)
+            info = self.petService.writeMusicSearchLog(keyword)
+            self.infoSolve(info)
+        except Exception as e:
+            self.exceptionSolve(e,OptionTypeEnum.MUSIC)
+
+    def getMusicToFile(self,id,content):
+        musicURL = self.service.getMusicURL(id)
+        data = downloadURLRes(musicURL)
+        saveTofile(data,GlobalConfig().TempMusic)
+        self.musicToFileSignal.emit(content)
+        try:
+            musicURL = self.service.getMusicURL(id)
             data = downloadURLRes(musicURL)
             saveTofile(data,GlobalConfig().TempMusic)
-            self.musicToFileSignal.emit()
-            info = self.petService.writeMusicLog(keyword,name)
+            self.musicToFileSignal.emit(content)
+            info = self.petService.writeMusicLog(content)
             self.infoSolve(info)
         except Exception as e:
             self.exceptionSolve(e,OptionTypeEnum.MUSIC)
@@ -49,7 +61,6 @@ class PetApplication(QObject):
             self.infoSolve(info)
         except Exception as e:
             self.exceptionSolve(e,OptionTypeEnum.RANDOM_PIC)
-
 
     def getWiki(self,keyword):
         try:

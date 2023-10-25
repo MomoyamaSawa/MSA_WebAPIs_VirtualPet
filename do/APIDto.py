@@ -146,3 +146,9 @@ class AIDrawDto():
     """
     def __init__(self,url):
         self.url = url
+
+class MusicListItemDto():
+    def __init__(self,id,name,author):
+        self.id = id
+        self.name = name
+        self.author = author

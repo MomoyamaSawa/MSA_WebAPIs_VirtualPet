@@ -32,10 +32,9 @@ class PetService():
             logs.append(log)
         return list(reversed(logs))
 
-    def writeMusicLog(self,keyword,name):
+    def writeMusicLog(self,content):
         musicLog = {
-            "关键词":keyword,
-            "歌曲名":name
+            "信息":content,
         }
         optionLogAgg = OptionLogAgg(OptionTypeEnum.MUSIC,musicLog)
         optionLogAgg.writeOptionLog()
@@ -134,5 +133,13 @@ class PetService():
             "windPower":windPower
         }
         optionLogAgg = OptionLogAgg(OptionTypeEnum.TIME_AND_WEATHER,timeAndWeatherLog)
+        optionLogAgg.writeOptionLog()
+        return str(optionLogAgg)
+
+    def writeMusicSearchLog(self,keyword):
+        musicListLog = {
+            "keyword":keyword
+        }
+        optionLogAgg = OptionLogAgg(OptionTypeEnum.MUSIC_LIST,musicListLog)
         optionLogAgg.writeOptionLog()
         return str(optionLogAgg)

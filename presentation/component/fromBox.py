@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import *
 from util.config import GlobalConfig
 from PyQt6.QtCore import *
 from PyQt6.QtGui import QFont
+from functools import partial
 
 class FromBox(QFrame):
 
@@ -65,6 +66,58 @@ class FromBox(QFrame):
     def _initQSS(self):
         self.setStyleSheet(f"""
             FromBox {{
+                background: {GlobalConfig().Panel['Background']};
+                border: {GlobalConfig().Panel['Border']};
+                border-radius: {GlobalConfig().Panel['BorderRadius']};
+            }}
+        """)
+
+
+class FromSelectBox(QFrame):
+
+    fromSelectSignal = pyqtSignal(str,str)
+
+    def __init__(self,title,indexs:list,contents:list[str]):
+        super().__init__()
+        self.setFixedWidth(GlobalConfig().Panel['Width'])
+        self.label = QLabel(title)
+        font = QFont("Arial", 21)
+        self.label.setFont(font)
+        self.contents = contents
+        self.indexs = indexs
+        self.labels = []
+
+        self.viewLayout = QVBoxLayout()
+        self.flowLayout = FlowLayout(needAni=True)
+        self.flowLayout.setContentsMargins(10, 5, 10, 10)
+        self.flowLayout.setAnimation(250, QEasingCurve.Type.OutQuad)
+        self.flowLayout.setVerticalSpacing(10)
+        self.flowLayout.setHorizontalSpacing(10)
+
+        self._initLayout()
+        self._initQSS()
+
+    def _initLayout(self):
+        self.setLayout(self.viewLayout)
+        self.viewLayout.addWidget(self.label,0,Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignCenter)
+        i = -1
+        for content in self.contents:
+            i = i + 1
+            label = PushButton(content)
+            # 注意这里用partial
+            label.clicked.connect(partial(self._yes, self.indexs[i],content))
+            self.flowLayout.addWidget(label)
+            self.labels.append(label)
+        self.viewLayout.addLayout(self.flowLayout)
+
+
+    def _yes(self,index,content):
+        self.fromSelectSignal.emit(index,content)
+        self.hide()
+
+    def _initQSS(self):
+        self.setStyleSheet(f"""
+            FromSelectBox {{
                 background: {GlobalConfig().Panel['Background']};
                 border: {GlobalConfig().Panel['Border']};
                 border-radius: {GlobalConfig().Panel['BorderRadius']};
