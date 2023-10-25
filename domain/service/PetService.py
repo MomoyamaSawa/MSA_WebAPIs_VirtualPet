@@ -112,3 +112,18 @@ class PetService():
         optionLogAgg = OptionLogAgg(OptionTypeEnum.SINGLE,singleLog)
         optionLogAgg.writeOptionLog()
         return str(optionLogAgg)
+
+    def writeTimeAndWeatherLog(self,year,month,day,weekday,weather,temp,humidity,windPower):
+        timeAndWeatherLog = {
+            "year":year,
+            "month":month,
+            "day":day,
+            "weekday":weekday,
+            "weather":weather,
+            "temp":temp,
+            "humidity":humidity,
+            "windPower":windPower
+        }
+        optionLogAgg = OptionLogAgg(OptionTypeEnum.TIME_AND_WEATHER,timeAndWeatherLog)
+        optionLogAgg.writeOptionLog()
+        return str(optionLogAgg)

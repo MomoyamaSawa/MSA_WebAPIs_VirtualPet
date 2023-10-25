@@ -24,16 +24,17 @@ class APIService:
         currentTime = datetime.now()
         return TimeDto(currentTime.year, currentTime.month, currentTime.day, currentTime.hour, currentTime.weekday())
 
-    def getWeather(self) -> WeatherDto:
+    async def getWeather(self) -> WeatherDto:
         """
         获得天气
+        https://lbs.amap.com/api/webservice/guide/api/weatherinfo
         """
         url = self.config.WebAPI["GetWeather"]["URL"]
         params = self.config.WebAPI["GetWeather"]["Params"]
-        response = requests.get(url, params=params)
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, params=params)
+            response.raise_for_status()
         data = response.json()
-        if (response.status_code != 200 or data['status'] != "1" or data['infocode'] != '10000'):
-            raise WebAPIException(response.status_code, response.text)
         return WeatherDto(data['lives'][0]['weather'], data['lives'][0]['temperature'], data['lives'][0]['winddirection'], data['lives'][0]['windpower'], data['lives'][0]['humidity'], data['lives'][0]['reporttime'])
 
     def getMusicID(self,keyword) -> str:

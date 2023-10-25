@@ -59,6 +59,7 @@ class MainWindow(QWidget):
     def _initConnections(self):
         self.app.getInfoFromImageSignal.connect(self.showMainMsg)
         self.app.singleSentanceSignal.connect(self.showMsg)
+        self.app.wheatherSignal.connect(self.showMsg)
 
 
     def _initLayout(self):
@@ -95,10 +96,10 @@ class MainWindow(QWidget):
 
     def leftTap(self):
         randomNumber = random.random()
-        if randomNumber < 0.75 :
+        if randomNumber < 0 :
             asyncio.run(self.app.getSingle())
         else:
-            self.showMsg(self.app.getTimeAndWeather())
+            asyncio.run(self.app.getTimeAndWeather())
 
     def rightTap(self):
         """

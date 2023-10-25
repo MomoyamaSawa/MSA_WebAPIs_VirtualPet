@@ -7,10 +7,12 @@ from common.AIDrawType import *
 from PyQt6.QtCore import pyqtSignal,QObject
 from do.APIDto import *
 from common.weekdayType import WeekDayEnumArr
+from common.OptionType import OptionTypeEnum
 
 class PetApplication(QObject):
     getInfoFromImageSignal = pyqtSignal(str)
     singleSentanceSignal = pyqtSignal(str)
+    wheatherSignal = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
@@ -86,15 +88,25 @@ class PetApplication(QObject):
             else:
                 self.singleSentanceSignal.emit(f"{dto.content}        ----{dto.where}")
             info = self.petService.writeSingleLog(dto.content,dto.where,dto.who)
-            print(cmdInfoStr(f"{info}"))
+            self.infoSolve(info)
         except Exception as e:
-            self.exceptionSolve(e)
+            self.exceptionSolve(e,OptionTypeEnum.SINGLE)
 
-    def getTimeAndWeather(self) -> str:
-        timeDTO = self.service.getTime()
-        wheatherDTO = self.service.getWeather()
-        return f"今天是{timeDTO.year}年{timeDTO.month}月{timeDTO.day}日{WeekDayEnumArr[int(timeDTO.weekDay)]}，天气为{wheatherDTO.weather}，温度{wheatherDTO.temperature}℃，湿度{wheatherDTO.humidity}%，风速{wheatherDTO.windPower}m/s"
+    async def getTimeAndWeather(self) -> str:
+        try:
+            timeDTO = self.service.getTime()
+            wheatherDTO = await self.service.getWeather()
+            self.wheatherSignal.emit(f"今天是{timeDTO.year}年{timeDTO.month}月{timeDTO.day}日{WeekDayEnumArr[int(timeDTO.weekDay)]}，天气为{wheatherDTO.weather}，温度{wheatherDTO.temperature}℃，湿度{wheatherDTO.humidity}%，风速{wheatherDTO.windPower}m/s")
+            info = self.petService.writeTimeAndWeatherLog(timeDTO.year,timeDTO.month,timeDTO.day,WeekDayEnumArr[int(timeDTO.weekDay)],wheatherDTO.weather,wheatherDTO.temperature,wheatherDTO.humidity,wheatherDTO.windPower)
+            self.infoSolve(info)
+        except Exception as e:
+            self.exceptionSolve(e,OptionTypeEnum.TIME_AND_WEATHER)
 
-    def exceptionSolve(self,e):
-        print(cmdErrStr(str(e)))
-        self.petService.writeExceptionLog(str(e))
+
+    def exceptionSolve(self,e,type:OptionTypeEnum):
+        err = type.value+": " + str(e)
+        print(cmdErrStr(err))
+        self.petService.writeExceptionLog(err)
+
+    def infoSolve(self,info):
+        print(cmdInfoStr(info))
