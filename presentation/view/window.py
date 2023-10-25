@@ -71,6 +71,7 @@ class MainWindow(QWidget):
         self.app.drawAISiganl.connect(self.stopLoopMsg)
         self.app.trSignal.connect(self.showMainMsg)
         self.app.wikiSignal.connect(self.showMainMsg)
+        self.app.historyTodaySignal.connect(self.showMainMsg)
 
 
     def _initLayout(self):
@@ -249,8 +250,8 @@ class MainWindow(QWidget):
         self.showWaitMsg("翻译中.....")
 
     def showHistoryOntoday(self):
-        day,content = self.app.getHistoryOnToday()
-        self.showMsg(f"{day}，{content}")
+        f = FunctionRunnable(self.app.getHistoryOnToday)
+        self.threadPool.start(f)
 
     def showRandomPic(self):
         f = FunctionRunnable(self.app.getRandomPicToFile)
@@ -264,6 +265,7 @@ class MainWindow(QWidget):
     def _showWiki(self,keyword):
         f = FunctionRunnable(self.app.getWiki,keyword)
         self.threadPool.start(f)
+        self.showWaitMsg("查询中.....")
 
     def showPicTip(self):
         position = TeachingTipTailPosition.RIGHT

@@ -131,9 +131,9 @@ class APIService:
         获得历史上的今天
         """
         url = self.config.WebAPI["History"]["URL"]
-        response = requests.get(url)
-        if (response.status_code != 200):
-            raise WebAPIException(response.status_code, response.text)
+        with httpx.Client() as client:
+            response = client.get(url)
+            response.raise_for_status()
         data = response.json()
         day = data['day']
         contents:list[HistoryOnTodayItem] = []

@@ -20,6 +20,7 @@ class PetApplication(QObject):
     drawAISiganl = pyqtSignal()
     trSignal = pyqtSignal(str)
     wikiSignal = pyqtSignal(str)
+    historyTodaySignal = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
@@ -61,12 +62,16 @@ class PetApplication(QObject):
         except Exception as e:
             self.exceptionSolve(e,OptionTypeEnum.WIKI)
 
-    def getHistoryOnToday(self) -> (str,str):
-        data = self.service.getHistoryOnToday()
-        # 随机取一条
-        content = chooseRandomElement(data.contents)
-        self.petService.writeHistoryLog(content.day,content.content)
-        return content.day, content.content
+    def getHistoryOnToday(self):
+        try:
+            data = self.service.getHistoryOnToday()
+            # 随机取一条
+            content = chooseRandomElement(data.contents)
+            self.historyTodaySignal.emit(f"{content.day}: {content.content}")
+            info = self.petService.writeHistoryLog(content.day,content.content)
+            self.infoSolve(info)
+        except Exception as e:
+            self.exceptionSolve(e,OptionTypeEnum.HISTORY)
 
     def getRandomMusic(self) -> (str,str):
         try:

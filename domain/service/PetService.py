@@ -106,6 +106,7 @@ class PetService():
         }
         optionLogAgg = OptionLogAgg(OptionTypeEnum.HISTORY,historyLog)
         optionLogAgg.writeOptionLog()
+        return str(optionLogAgg)
 
     def writeExceptionLog(self,exception):
         optionLogAgg = ExceptionLogAgg(exception)
