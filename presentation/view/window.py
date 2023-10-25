@@ -13,6 +13,7 @@ from util.live2D import *
 from common.AIDrawType import *
 from common.LanguageType import *
 from util.showCon import *
+from util.tools import *
 
 class MainWindow(QWidget):
     """
@@ -26,6 +27,7 @@ class MainWindow(QWidget):
 
         self.app = PetApplication()
         self._initConnections()
+        self.threadPool = QThreadPool()
 
         self.audioOutput = QAudioOutput()
         self.audioOutput.setVolume(50)
@@ -48,7 +50,6 @@ class MainWindow(QWidget):
         self.leftTapTimer.setInterval(5000)
         self.leftTapTimer.setSingleShot(True)
 
-
         # 隐藏边框
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
@@ -60,6 +61,7 @@ class MainWindow(QWidget):
         self.app.getInfoFromImageSignal.connect(self.showMainMsg)
         self.app.singleSentanceSignal.connect(self.showMsg)
         self.app.wheatherSignal.connect(self.showMsg)
+        self.app.gptSignal.connect(self.showMainMsg)
 
 
     def _initLayout(self):
@@ -82,8 +84,9 @@ class MainWindow(QWidget):
             x, y = getPos(self.dll)
             self.move(x - self.width() // 2, y - self.height() // 2)
             if isLeftTouched(self.dll) and self.isLeftTapOK:
-                self.leftTap()
+                # 下面两句话顺序有要求
                 self.setLeftTapOK(False)
+                self.leftTap()
             if isRightTouched(self.dll):
                 self.rightTap()
 
@@ -96,7 +99,7 @@ class MainWindow(QWidget):
 
     def leftTap(self):
         randomNumber = random.random()
-        if randomNumber < 0 :
+        if randomNumber < 0.8 :
             asyncio.run(self.app.getSingle())
         else:
             asyncio.run(self.app.getTimeAndWeather())
@@ -173,8 +176,9 @@ class MainWindow(QWidget):
 
     @pyqtSlot(str)
     def _gpt(self,content):
-        msg = self.app.getGPT(content)
-        self.showMsg(msg)
+        f = FunctionRunnable(self.app.getGPT,content)
+        self.threadPool.start(f)
+        self.showWaitMsg()
 
     def showFromBox(self,title,content,options=None):
         # if self.dialog.isVisible():
@@ -207,8 +211,14 @@ class MainWindow(QWidget):
 
     def showMainMsg(self,msg):
         self.showMsg(msg)
+        # 下面两句话的先后顺序有要求
+        self.setLeftTapOK(False)
         self.leftTapTimer.stop()
         self.dialog.hideSignal.connect(lambda :self.setLeftTapOK(True))
+
+    def showWaitMsg(self):
+        self.stateMa.setState(DialogState(self.dialog))
+        self.dialog.printLoopDialog(GlobalConfig().PetName + "思考中.....",GlobalConfig().Timeout)
 
     def tr(self):
         frombox = self.showFromBox("翻译","请输入要翻译的文本",[languageOptions])
@@ -278,4 +288,3 @@ class MainWindow(QWidget):
         self.app.getMusicToFile(keyWord)
         self.player.setSource(QUrl.fromLocalFile(GlobalConfig().TempMusic))
         self.player.play()
-

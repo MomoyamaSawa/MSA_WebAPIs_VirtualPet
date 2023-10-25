@@ -22,6 +22,7 @@ class DialogState(StateBase):
 
     def backward(self,main):
         self._q.hide()
+        self._q.update()
 
 class FromBoxState(StateBase):
 
@@ -33,6 +34,7 @@ class FromBoxState(StateBase):
 
     def backward(self,main):
         self._q.hide()
+        self._q.update()
         self._q.deleteLater()
 
 

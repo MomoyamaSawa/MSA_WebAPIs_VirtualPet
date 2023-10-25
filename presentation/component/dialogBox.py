@@ -7,6 +7,7 @@ from qfluentwidgets import ToolButton
 from util.config import GlobalConfig
 import sys
 from qfluentwidgets import FluentIcon as FIF
+from util.tools import cmdErrStr
 
 class DialogBox(QFrame):
     """
@@ -20,6 +21,8 @@ class DialogBox(QFrame):
         self.vBoxLayout = QVBoxLayout()
         self.setFixedWidth(375)
         self.timer = QTimer()
+        self.timeTimer = QTimer()
+        self.timeTimer.timeout.connect(self.timeoutFunc)
         self.state = 1
 
         self.label = QLabel(content)
@@ -35,21 +38,32 @@ class DialogBox(QFrame):
         self.vBoxLayout.setContentsMargins(30, 20, 30, 20)
         self.vBoxLayout.addWidget(self.label, 0, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
 
-    def printDialog(self, text):
-        if self.timer.isActive():
+    def printDialog(self, text,loop = False,time=0):
+        if self.timer.isActive() or self.timeTimer.isActive():
             self.timer.stop()
+            self.timeTimer.stop()
         self.timer = QTimer()
         self.state = 1
         self.currentIndex = 0
         self.label.setText("")
         self.index = 0
         self.text = text
-        self.timer.timeout.connect(self.showNextCharacter)
+        self.timer.timeout.connect(lambda: self.showNextCharacter(loop))
         self.timer.start(100)
+        if time != 0:
+            self.timeTimer.start(time*1000)
 
-    def showNextCharacter(self):
+    def timeoutFunc(self):
+        self.timer.stop()
+        self.timeTimer.stop()
+        self.label.setText("（[error] 响应超时，请检查错误日志）")
+
+    def showNextCharacter(self,loop=False):
         if self.currentIndex >= len(self.text):
-            self.timer.stop()
+            if loop:
+                self.currentIndex = 0
+            else:
+                self.timer.stop()
             return
 
         self.label.setText(self.text[self.index:self.currentIndex + 1])
@@ -145,6 +159,9 @@ class CharacterDialogBox(QWidget):
 
     def printDialog(self,text):
         self.DialogBox.printDialog(text)
+
+    def printLoopDialog(self,text,time):
+        self.DialogBox.printDialog(text,True,time)
 
     def hideEvent(self, a0: QHideEvent) -> None:
         self.hideSignal.emit()

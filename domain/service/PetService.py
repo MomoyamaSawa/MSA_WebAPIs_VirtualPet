@@ -18,6 +18,7 @@ class PetService():
         }
         optionLogAgg = OptionLogAgg(OptionTypeEnum.GPT,gptLog)
         optionLogAgg.writeOptionLog()
+        return str(optionLogAgg)
 
     def getGPTLogs(self,n) -> list[GptLogItem]:
         """

@@ -1,6 +1,7 @@
 from do.APIDto import *
 import requests, random, datetime
 from exception import WebAPIException
+from PyQt6.QtCore import QRunnable
 
 def downloadURLRes(url) -> bytes:
     response = requests.get(url)
@@ -33,3 +34,14 @@ def cmdInfoStr(msg):
 
 def cmdMainInfoStr(msg):
     return f"\033[94m[info] {msg}\033[0m"
+
+class FunctionRunnable(QRunnable):
+    def __init__(self, function, *args, **kwargs):
+        super().__init__()
+        self.function = function
+        self.args = args
+        self.kwargs = kwargs
+
+    def run(self):
+        # 在这里执行函数任务
+        self.function(*self.args, **self.kwargs)

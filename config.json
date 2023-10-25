@@ -124,6 +124,7 @@
     "Storage":"./storage/",
     "TempMusic":"./resource/temp/TempMusic",
     "TempPic":"./resource/temp/TempPic",
-    "PetName":"草薙寧々",
-    "Live2dPath":"./resource/live2d.dll"
+    "PetName":"寧々",
+    "Live2dPath":"./resource/live2d.dll",
+    "Timeout":10
 }

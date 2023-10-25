@@ -206,6 +206,7 @@ class APIService:
     def getGPT(self,msg,logs:list[GptLogsDto]) -> str :
         """
         GPT-3.5
+        https://chatanywhere.apifox.cn/
         """
         url = GlobalConfig().WebAPI["GPT"]["URL"]
         params = GlobalConfig().WebAPI["GPT"]["Data"]
@@ -229,7 +230,9 @@ class APIService:
         }
         params['messages'].append(now)
         headers = GlobalConfig().WebAPI["GPT"]["Headers"]
-        response = requests.post(url, data=json.dumps(params),headers=headers)
+        with httpx.Client() as client:
+            response = client.post(url, data=json.dumps(params),headers=headers,timeout=GlobalConfig().Timeout)
+            response.raise_for_status()
         data = response.json()
         return data['choices'][0]['message']['content']
 
