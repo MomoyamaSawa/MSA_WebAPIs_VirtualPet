@@ -72,11 +72,3 @@ class FromBox(QFrame):
         """)
 
 
-# class OptionsFromBox(FromBox):
-#     def __init__(self,title,content,options):
-#         super.__init__(title,content)
-
-#         for option in options:
-#             ComboBox(self).addItems(option)
-#             self.viewLayout.addWidget(option)
-

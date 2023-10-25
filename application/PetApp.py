@@ -10,6 +10,8 @@ from common.weekdayType import WeekDayEnumArr
 
 class PetApplication(QObject):
     getInfoFromImageSignal = pyqtSignal(str)
+    singleSentanceSignal = pyqtSignal(str)
+
     def __init__(self):
         super().__init__()
         self.service = APIService()
@@ -76,12 +78,23 @@ class PetApplication(QObject):
         self.petService.writeGPTLog(msg,ans)
         return ans
 
-    def getSingle(self)->str:
-        dto = self.service.getSingleSentance()
-        return f"FROM {dto.where}({dto.who}): {dto.content}"
+    async def getSingle(self)->str:
+        try:
+            dto = await self.service.getSingleSentance()
+            if dto.who:
+                self.singleSentanceSignal.emit(f"{dto.content}        ----{dto.where}（{dto.who}）")
+            else:
+                self.singleSentanceSignal.emit(f"{dto.content}        ----{dto.where}")
+            info = self.petService.writeSingleLog(dto.content,dto.where,dto.who)
+            print(cmdInfoStr(f"{info}"))
+        except Exception as e:
+            self.exceptionSolve(e)
 
     def getTimeAndWeather(self) -> str:
         timeDTO = self.service.getTime()
         wheatherDTO = self.service.getWeather()
         return f"今天是{timeDTO.year}年{timeDTO.month}月{timeDTO.day}日{WeekDayEnumArr[int(timeDTO.weekDay)]}，天气为{wheatherDTO.weather}，温度{wheatherDTO.temperature}℃，湿度{wheatherDTO.humidity}%，风速{wheatherDTO.windPower}m/s"
 
+    def exceptionSolve(self,e):
+        print(cmdErrStr(str(e)))
+        self.petService.writeExceptionLog(str(e))

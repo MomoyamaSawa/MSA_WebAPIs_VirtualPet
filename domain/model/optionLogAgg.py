@@ -2,6 +2,7 @@ from dataaccess.database import DatabaseRepository
 from common.OptionType import OptionTypeEnum
 from dataaccess.models import OptionLog
 import uuid,time,json, datetime
+from util.tools import fromDateTimeToStr
 
 class OptionLogAgg():
     def __init__(self,type:OptionTypeEnum,content:object,_make=True):
@@ -23,6 +24,9 @@ class OptionLogAgg():
         database = DatabaseRepository()
         optionlog = OptionLog(id=str(self.id),time=self.time,type=self.type.value,content=json.dumps(self.content))
         database.add(optionlog)
+
+    def __str__(self) -> str:
+        return fromDateTimeToStr(self.time)+" "+self.type.name+" "+str(self.content)
 
     @staticmethod
     def getGptLogs(n):

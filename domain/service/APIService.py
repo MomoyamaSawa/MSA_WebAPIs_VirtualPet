@@ -1,11 +1,12 @@
 from util.config import GlobalConfig
 from datetime import datetime
 from do.APIDto import *
-import requests,httpx,json
+import requests,httpx,json,random
 from exception import WebAPIException
 from common.LanguageType import LanguageTypeEnum
 from common.AIDrawType import *
 from common.RankingImgType import RankingImgType,RankingImgMode
+from common.hitohotoType import HitokotoTypeEnum
 from datetime import datetime,timedelta
 from do.PetDto import *
 
@@ -68,13 +69,18 @@ class APIService:
         response = requests.get(url)
         return url,response.content
 
-    def getSingleSentance(self) -> SentanceDataDto:
+    async def getSingleSentance(self) -> SentanceDataDto:
         """
         获得随机的语句
-        TODO 之后可以扩充一下参数。我看那个参数蛮多的
+        https://developer.hitokoto.cn/sentence/
         """
         url = self.config.WebAPI["Sentance"]["URL"]
-        response = requests.get(url)
+        value = random.sample(list(HitokotoTypeEnum), 1)
+        # 随机来一个分类
+        params = {'c': value[0].value}
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, params=params)
+            response.raise_for_status()
         data = response.json()
         return SentanceDataDto(data['from'], data['from_who'], data['hitokoto'])
 
@@ -142,7 +148,7 @@ class APIService:
             # only httpx 不知道为什么用request防火墙会拦
             response = await client.post(url, files=files, params=params)
             response.raise_for_status()
-            data = response.json()
+        data = response.json()
         return data["data"][0]['name'],data["data"][0]['cartoonname']
 
     def getRandomMusic(self) -> RandomMusicDto:

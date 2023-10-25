@@ -24,3 +24,12 @@ def chooseRandomElement(array):
 
 def fromDateTimeToStr(dateTime:datetime):
     return dateTime.strftime("%Y-%m-%d %H:%M:%S")
+
+def cmdErrStr(msg):
+    return f"\033[31m[error] {msg}\033[0m"
+
+def cmdInfoStr(msg):
+    return f"[info] {msg}"
+
+def cmdMainInfoStr(msg):
+    return f"\033[94m[info] {msg}\033[0m"

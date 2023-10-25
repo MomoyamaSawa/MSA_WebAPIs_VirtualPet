@@ -10,4 +10,5 @@ class OptionTypeEnum(Enum):
     TR = "TR"
     WIKI = "WIKI"
     HISTORY = "HISTORY"
+    SINGLE = "SINGLE"
 

@@ -25,7 +25,7 @@ class MainWindow(QWidget):
         self.hboxLayout = QHBoxLayout(self)
 
         self.app = PetApplication()
-        self.app.getInfoFromImageSignal.connect(self.showMsg)
+        self._initConnections()
 
         self.audioOutput = QAudioOutput()
         self.audioOutput.setVolume(50)
@@ -55,6 +55,11 @@ class MainWindow(QWidget):
 
         self._initQss()
         self._initLayout()
+
+    def _initConnections(self):
+        self.app.getInfoFromImageSignal.connect(self.showMainMsg)
+        self.app.singleSentanceSignal.connect(self.showMsg)
+
 
     def _initLayout(self):
         self.setLayout(self.hboxLayout)
@@ -89,13 +94,9 @@ class MainWindow(QWidget):
         """)
 
     def leftTap(self):
-        # if self.frombox is not None:
-        #     self.frombox.hide()
-        #     self.frombox.deleteLater()
-        #     self.frombox = None
         randomNumber = random.random()
         if randomNumber < 0.75 :
-            self.showMsg(self.app.getSingle())
+            asyncio.run(self.app.getSingle())
         else:
             self.showMsg(self.app.getTimeAndWeather())
 

@@ -1,3 +1,4 @@
+from PyQt6 import QtGui
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 from PyQt6.QtGui import *
@@ -120,6 +121,7 @@ class CharacterBox(QFrame):
         self.label.setStyleSheet("color: white;")
 
 class CharacterDialogBox(QWidget):
+    hideSignal = pyqtSignal()
     def __init__(self, name):
         super().__init__()
 
@@ -143,6 +145,10 @@ class CharacterDialogBox(QWidget):
 
     def printDialog(self,text):
         self.DialogBox.printDialog(text)
+
+    def hideEvent(self, a0: QHideEvent) -> None:
+        self.hideSignal.emit()
+        return super().hideEvent(a0)
 
 
 if __name__ == '__main__':

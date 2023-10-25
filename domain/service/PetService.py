@@ -1,4 +1,5 @@
 from domain.model.optionLogAgg import OptionLogAgg
+from domain.model.exceptionLogAgg import ExceptionLogAgg
 from common.OptionType import OptionTypeEnum
 from do.PetDto import *
 from util.tools import fromDateTimeToStr
@@ -97,3 +98,17 @@ class PetService():
         }
         optionLogAgg = OptionLogAgg(OptionTypeEnum.HISTORY,historyLog)
         optionLogAgg.writeOptionLog()
+
+    def writeExceptionLog(self,exception):
+        optionLogAgg = ExceptionLogAgg(exception)
+        optionLogAgg.writeExceptionLog()
+
+    def writeSingleLog(self,content,where,who):
+        singleLog = {
+            "content":content,
+            "where":where,
+            "who":who
+        }
+        optionLogAgg = OptionLogAgg(OptionTypeEnum.SINGLE,singleLog)
+        optionLogAgg.writeOptionLog()
+        return str(optionLogAgg)
