@@ -15,7 +15,7 @@
 
 本仓库为同济大学软件学院 2023 秋微服务架构课程个人项目：Programming with Web APIs
 
-作业要求 & 作业笔记 & 其他事项见链接：🔗 [Review](https://momoyamasawa.notion.site/c042699d595540bdbe9aa4b0ab18cd9b?pvs=4)
+作业要求 & 作业笔记 & 其他事项见链接：🔗 [Review](https://momoyamasawa.notion.site/bf2c83d5b0dd4c92bbde009b307eca97?pvs=4)
 
 设计和实现报告：🔗 [设计和实现报告](https://momoyamasawa.notion.site/c9e14d81e72840f9a227fd5c3aeecd73?pvs=4)
 
