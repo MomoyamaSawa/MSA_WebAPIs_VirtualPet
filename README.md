@@ -21,7 +21,7 @@
 
 配置和部署报告：🔗 [配置和部署报告](https://momoyamasawa.notion.site/d2b336f3086a47b19f450fe0ec6be2ca?pvs=4)
 
-![GIF 2023-10-27 18-23-32](./README.assets/GIF 2023-10-27 18-23-32.gif)
+![GIF](./README.assets/GIF.gif)
 
 ![1698401859072](./README.assets/1698401859072.jpg)
 
