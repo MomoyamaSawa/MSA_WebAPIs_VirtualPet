@@ -1,13 +1,9 @@
-from PyQt6 import QtGui
-from PyQt6.QtWidgets import *
-from PyQt6.QtCore import *
-from PyQt6.QtGui import *
-from PyQt6.QtSvgWidgets import *
-from qfluentwidgets import ToolButton
+from PyQt6.QtWidgets import QFrame, QVBoxLayout, QLabel, QHBoxLayout, QWidget,QApplication
+from PyQt6.QtCore import pyqtSignal, Qt, QTimer, pyqtSlot
+from PyQt6.QtGui import QFontMetrics, QFont,QHideEvent
+from PyQt6.QtSvgWidgets import QSvgWidget
 from util.config import GlobalConfig
 import sys
-from qfluentwidgets import FluentIcon as FIF
-from util.tools import cmdErrStr
 
 class DialogBox(QFrame):
     """
@@ -15,12 +11,11 @@ class DialogBox(QFrame):
     """
     hideSignal = pyqtSignal()
 
-    def __init__(self, content):
-        super().__init__()
+    def __init__(self, parent,content):
+        super().__init__(parent = parent)
 
         self.vBoxLayout = QVBoxLayout()
         self.setFixedWidth(375)
-        self.timer = QTimer()
         self.timeTimer = QTimer()
         self.timeTimer.timeout.connect(self.timeoutFunc)
         self.state = 1
@@ -30,6 +25,8 @@ class DialogBox(QFrame):
         # 占据父组件的全部宽度
         self.label.setFixedWidth(320)
         self.label.setWordWrap(True)
+
+        self.timer = QTimer()
 
         self._initLayout()
         self._initQss()
@@ -55,6 +52,11 @@ class DialogBox(QFrame):
         if time != 0:
             self.timeTimer.start(time*1000)
             self.isOK = False
+
+    def deleteEvent(self):
+        self.timer.stop()
+        self.timeTimer.stop()
+        self.isOK = True
 
     def stopDialog(self):
         self.timer.stop()
@@ -146,13 +148,13 @@ class CharacterBox(QFrame):
 class CharacterDialogBox(QWidget):
     hideSignal = pyqtSignal()
     stopLoopSignal = pyqtSignal()
-    def __init__(self, name):
-        super().__init__()
+    def __init__(self,parent, name):
+        super().__init__(parent=parent)
 
         self.setFixedSize(400, 150)
         self.vBoxlayout = QVBoxLayout()
 
-        self.DialogBox = DialogBox("")
+        self.DialogBox = DialogBox(parent,"")
         self.characterBox = CharacterBox(name)
         self.DialogBox.hideSignal.connect(self.hide)
         self.DialogBox.timeTimer.timeout.connect(self.stopLoopSignal.emit)
@@ -177,6 +179,9 @@ class CharacterDialogBox(QWidget):
     def hideEvent(self, a0: QHideEvent) -> None:
         self.hideSignal.emit()
         return super().hideEvent(a0)
+
+    def deleteEvent(self):
+        self.DialogBox.deleteEvent()
 
     @pyqtSlot()
     def stopDialog(self):

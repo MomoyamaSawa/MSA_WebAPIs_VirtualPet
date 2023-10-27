@@ -152,3 +152,7 @@ cython_debug/
 #.idea/
 test.py
 *.db
+resource/temp/TempMusic
+resource/temp/TempMusic
+resource/temp/TempPic
+resource/temp/TempMusic

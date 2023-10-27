@@ -1,13 +1,11 @@
 from util.config import GlobalConfig
 from datetime import datetime
 from do.APIDto import *
-import requests,httpx,json,random
-from exception import WebAPIException
+import httpx,json,random
 from common.LanguageType import LanguageTypeEnum
 from common.AIDrawType import *
-from common.RankingImgType import RankingImgType,RankingImgMode
 from common.hitohotoType import HitokotoTypeEnum
-from datetime import datetime,timedelta
+from datetime import datetime
 from do.PetDto import *
 
 class APIService:
@@ -29,10 +27,10 @@ class APIService:
         获得天气
         https://lbs.amap.com/api/webservice/guide/api/weatherinfo
         """
-        url = self.config.WebAPI["GetWeather"]["URL"]
-        params = self.config.WebAPI["GetWeather"]["Params"]
+        url = GlobalConfig().WebAPI["GetWeather"]["URL"]
+        params =  GlobalConfig().WebAPI["GetWeather"]["Params"]
         with httpx.Client() as client:
-            response = client.get(url, params=params)
+            response = client.get(url, params=params,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
         return WeatherDto(data['lives'][0]['weather'], data['lives'][0]['temperature'], data['lives'][0]['winddirection'], data['lives'][0]['windpower'], data['lives'][0]['humidity'], data['lives'][0]['reporttime'])
@@ -47,7 +45,7 @@ class APIService:
         searchParams = self.config.WebAPI["Music"]["Search"]["Params"]
         searchParams['keywords'] = keyword
         with httpx.Client() as client:
-            response = client.get(searchURL, params=searchParams)
+            response = client.get(searchURL, params=searchParams,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
         return data['result']['songs'][0]['id'],data['result']['songs'][0]['name']
@@ -57,7 +55,7 @@ class APIService:
         searchParams = GlobalConfig().WebAPI["Music"]["Search"]["Params"]
         searchParams['keywords'] = keyword
         with httpx.Client() as client:
-            response = client.get(searchURL, params=searchParams)
+            response = client.get(searchURL, params=searchParams,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
         results = []
@@ -66,11 +64,11 @@ class APIService:
         return results
 
     def getMusicURL(self,id) -> (str,type):
-        getURL = self.config.WebAPI["Music"]["Get"]["URL"]
-        getParams = self.config.WebAPI["Music"]["Get"]["Params"]
+        getURL =  GlobalConfig().WebAPI["Music"]["Get"]["URL"]
+        getParams =  GlobalConfig().WebAPI["Music"]["Get"]["Params"]
         getParams['id'] = id
         with httpx.Client() as client:
-            response = client.get(getURL, params=getParams)
+            response = client.get(getURL, params=getParams,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
         musicURL = data['data'][0]['url']
@@ -82,7 +80,7 @@ class APIService:
         """
         url = self.config.WebAPI["Picture"]["URL"]
         with httpx.Client() as client:
-            response = client.get(url)
+            response = client.get(url,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         return url,response.content
 
@@ -96,48 +94,48 @@ class APIService:
         # 随机来一个分类
         params = {'c': value[0].value}
         with httpx.Client() as client:
-            response = client.get(url, params=params)
+            response = client.get(url, params=params,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
         return SentanceDataDto(data['from'], data['from_who'], data['hitokoto'])
 
-    def getSearchImages(self,type:RankingImgType,mode:RankingImgMode):
-        """
-        获得搜索图片
-        BUG 还未写好
-        """
-        url = self.config.WebAPI["Image"]["Ranking"]["URL"]
-        params = self.config.WebAPI["Image"]["Ranking"]["Params"]
-        params['ranking_type'] = type.value
-        params['mode'] = mode.value
-        current_date = datetime.now()
-        previous_date = current_date - timedelta(days=2)
-        formatted_date = previous_date.strftime("%Y-%m-%d")
-        params['date'] = formatted_date
-        response = requests.get(url, params=params)
-        data = response.json()
-        nextPage = data["next_url"]
-        # TODO 这边他一次最少返回30个好象，要处理一下
-        num =  self.config.WebAPI["Image"]["Ranking"]["Params"]["per_page"]
-        data = data["illusts"]
-        results = []
+    # def getSearchImages(self,type:RankingImgType,mode:RankingImgMode):
+    #     """
+    #     获得搜索图片
+    #     BUG 还未写好
+    #     """
+    #     url = self.config.WebAPI["Image"]["Ranking"]["URL"]
+    #     params = self.config.WebAPI["Image"]["Ranking"]["Params"]
+    #     params['ranking_type'] = type.value
+    #     params['mode'] = mode.value
+    #     current_date = datetime.now()
+    #     previous_date = current_date - timedelta(days=2)
+    #     formatted_date = previous_date.strftime("%Y-%m-%d")
+    #     params['date'] = formatted_date
+    #     response = requests.get(url, params=params)
+    #     data = response.json()
+    #     nextPage = data["next_url"]
+    #     # TODO 这边他一次最少返回30个好象，要处理一下
+    #     num =  self.config.WebAPI["Image"]["Ranking"]["Params"]["per_page"]
+    #     data = data["illusts"]
+    #     results = []
 
-        # 遍历前num个元素
-        for item in data[:num]:
-            title = item["title"]
-            username = item["user"]["name"]
-            id = item["id"]
-            caption = item["caption"]
+    #     # 遍历前num个元素
+    #     for item in data[:num]:
+    #         title = item["title"]
+    #         username = item["user"]["name"]
+    #         id = item["id"]
+    #         caption = item["caption"]
 
-            imageURL = item["image_urls"]["large"]
+    #         imageURL = item["image_urls"]["large"]
 
-            # 创建包含所需字段的字典
-            result = SearchImagesItem(id,title,username,imageURL,caption)
+    #         # 创建包含所需字段的字典
+    #         result = SearchImagesItem(id,title,username,imageURL,caption)
 
-            # 将字典添加到结果列表中
-            results.append(result)
+    #         # 将字典添加到结果列表中
+    #         results.append(result)
 
-        return SearchImagesDto(results,nextPage)
+    #     return SearchImagesDto(results,nextPage)
 
     def getHistoryOnToday(self) -> HistoryOnTodayDto:
         """
@@ -145,7 +143,7 @@ class APIService:
         """
         url = self.config.WebAPI["History"]["URL"]
         with httpx.Client() as client:
-            response = client.get(url)
+            response = client.get(url,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
         day = data['day']
@@ -163,7 +161,7 @@ class APIService:
         params = self.config.WebAPI["InfoFromImage"]["Params"]
         with httpx.Client() as client:
             # only httpx 不知道为什么用request防火墙会拦
-            response = client.post(url, files=files, params=params)
+            response = client.post(url, files=files, params=params,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
         return data["data"][0]['name'],data["data"][0]['cartoonname']
@@ -176,7 +174,7 @@ class APIService:
         url = self.config.WebAPI["Music"]["Random"]["URL"]
         params = self.config.WebAPI["Music"]["Random"]["Params"]
         with httpx.Client() as client:
-            response = client.get(url, params=params)
+            response = client.get(url, params=params,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
         return RandomMusicDto(data['id'],data['title'],data['artist'],data['cover'])
@@ -191,7 +189,7 @@ class APIService:
         params['msg'] = msg
         params['to'] = to.value
         with httpx.Client() as client:
-            response = client.get(url, params=params)
+            response = client.get(url, params=params,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
         return data["msg"]
@@ -205,7 +203,7 @@ class APIService:
         params.update(self.config.WebAPI["Wiki"]["SearchParams"])
         params['srsearch'] = keyword
         with httpx.Client() as client:
-            response = client.get(url, params=params)
+            response = client.get(url, params=params,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
         results = []
@@ -222,7 +220,7 @@ class APIService:
         params.update(self.config.WebAPI["Wiki"]["GetParams"])
         params['pageids'] = id
         with httpx.Client() as client:
-            response = client.get(url, params=params)
+            response = client.get(url, params=params,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
         return WikiDetailDto(data['query']['pages'][f'{id}']['title'],data['query']['pages'][f'{id}']['extract'])
@@ -270,7 +268,7 @@ class APIService:
         params['style'] = style.value
         params['ratio'] = radio.value
         with httpx.Client() as client:
-            response = client.post(url, data=params,timeout=50)
+            response = client.post(url, data=params,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
         return data['data']['result']['img']

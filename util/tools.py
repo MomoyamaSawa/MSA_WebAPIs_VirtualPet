@@ -1,12 +1,11 @@
 from do.APIDto import *
-import requests, random, datetime
-from exception import WebAPIException
+import httpx, random, datetime
 from PyQt6.QtCore import QRunnable
 
 def downloadURLRes(url) -> bytes:
-    response = requests.get(url)
-    if (response.status_code != 200):
-        raise WebAPIException(response.status_code, response.text)
+    with httpx.Client() as client:
+        response = client.get(url)
+        response.raise_for_status()
     return response.content
 
 def saveTofile(data:bytes, filename):

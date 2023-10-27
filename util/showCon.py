@@ -37,8 +37,6 @@ class FromBoxState(StateBase):
         self._q.update()
         self._q.deleteLater()
 
-
-
 class ShowWinStateMachine:
     _state = None
     _main = None

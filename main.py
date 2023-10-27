@@ -1,5 +1,4 @@
-from PyQt6.QtCore import *
-from PyQt6.QtWidgets import *
+from PyQt6.QtWidgets import QApplication
 import sys
 from presentation.view.window import MainWindow
 from util.databaseCreate import checkDatabase

@@ -1,9 +1,6 @@
-from PyQt6.QtCore import *
-from PyQt6.QtWidgets import *
-from PyQt6.QtGui import *
 from PyQt6.QtMultimedia import QMediaPlayer,QAudioOutput
 from util.config import GlobalConfig
-from qfluentwidgets import *
+from qfluentwidgets import PushButton,Action,TeachingTip,TeachingTipView,TeachingTipTailPosition,CommandBarView,Flyout,FlyoutAnimationType
 from qfluentwidgets import FluentIcon as FIF
 from application.PetApp import PetApplication
 from presentation.component.fromBox import *
@@ -35,7 +32,7 @@ class MainWindow(QWidget):
         self.player.playbackStateChanged.connect(lambda :self._closeOptionTip(self.player.playbackState()))
         self.musicTip = None
 
-        self.dialog = CharacterDialogBox(GlobalConfig().PetName)
+        self.dialog = CharacterDialogBox(self,GlobalConfig().PetName)
         self.dialog.hide()
         self.dialog.stopLoopSignal.connect(self.stopLoopMsg)
         self.frombox = None
@@ -68,6 +65,7 @@ class MainWindow(QWidget):
         self.app.musicToFileSignal.connect(self._playMusicFromFile)
         self.app.musicToFileSignal.connect(self.stopLoopMsg)
         self.app.randomMusicSiganl.connect(self._randomMusic)
+        self.app.randomMusicSiganl.connect(self.stopLoopMsg)
         self.app.randomPicSignal.connect(self.showPicTip)
         self.app.randomPicSignal.connect(self.stopLoopMsg)
         self.app.drawAISiganl.connect(self.showPicTip)
@@ -77,6 +75,22 @@ class MainWindow(QWidget):
         self.app.wikiSignal.connect(self.showMainMsg)
         self.app.historyTodaySignal.connect(self.showMainMsg)
         self.app.musicListSignal.connect(self._selectMusic)
+        self.app.badSignal.connect(self.stopLoopMsg)
+        self.app.restartSignal.connect(self.restart)
+
+    def restart(self):
+        geometry = self.geometry()
+        dll = self.dll
+        dllThread = self.dllThread
+        self.hide()
+        self.dialog.deleteEvent()
+        self.stopMusic()
+        self.deleteLater()
+        new = MainWindow()
+        new.setGeometry(geometry)
+        new.dll = dll
+        new.dllThread = dllThread
+        new.show()
 
     def _initLayout(self):
         self.setLayout(self.hboxLayout)
@@ -90,13 +104,24 @@ class MainWindow(QWidget):
 
     @pyqtSlot()
     def initLive2d(self):
+        qr = self.frameGeometry()
+        cp = self.screen().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
         globalPosition = self.geometry().center()
         self.dll,self.dllThread = createLive2D(globalPosition.x(),globalPosition.y())
 
     def updateFrom(self):
         if self.dll is not None and isOK(self.dll):
             x, y = getPos(self.dll)
-            self.move(x - self.width() // 2, y - self.height() // 2)
+            newX = x - self.width() // 2
+            newY = y - self.height() // 2
+            pos = self.mapFromGlobal(QPoint(newX, newY))
+            # self.move(0,40)
+            self.move(x - self.width() // 2, y - self.height() // 2 - 100)
+            g = self.geometry()
+            t = g.x()
+            b = g.y()
             if isLeftTouched(self.dll) and self.isLeftTapOK:
                 # 下面两句话顺序有要求
                 self.setLeftTapOK(False)
@@ -166,16 +191,19 @@ class MainWindow(QWidget):
         # view.addHiddenAction(stopMusic)
         # stopMusic.triggered.connect(self.stopMusic)
 
-        view.addHiddenAction(Action(FIF.SETTING, '设置'))
+        # view.addHiddenAction(Action(FIF.SETTING, '设置'))
+        restart = Action(FIF.ROTATE, '重启UI')
+        view.addHiddenAction(restart)
+        restart.triggered.connect(self.restart)
 
-        closeAction = Action(FIF.CLOSE, '关闭')
+        closeAction = Action(FIF.CLOSE, '关闭桌宠')
         closeAction.triggered.connect(lambda: self.onClose())
         view.addHiddenAction(closeAction)
         view.resizeToSuitableWidth()
 
         left = self.geometry().left()
         h = self.geometry().height()
-        pos = QPoint(left, self.geometry().top() + h * 0.7)
+        pos = QPoint(left, self.geometry().bottom()-50)
         Flyout.make(view, pos, self, FlyoutAnimationType.FADE_IN)
 
     def onClose(self):
@@ -227,14 +255,15 @@ class MainWindow(QWidget):
         self.player.stop()
 
     def _randomMusic(self,title,author):
-        self._playMusicFromFile()
-        self.showMainMsg(f"正在播放：{title}，作者：{author}")
-        self.showOptionTip("音乐播放中~",f"正在播放：{title}，作者：{author}")
+        self._playMusicFromFile(f"正在播放：{title}，作者：{author}")
+        # self.showMainMsg(f"正在播放：{title}，作者：{author}")
+        # self.showOptionTip("音乐播放中~",f"正在播放：{title}，作者：{author}")
 
     def search(self):
         # 打开文件选择对话框
         file, _ = QFileDialog.getOpenFileName(self, "选择图片文件", "", "Image Files (*.png *.jpg)")
         f = FunctionRunnable(self.app.getInfoFromImage,file)
+        # f = self.app.getInfoFromImage(file)
         self.threadPool.start(f)
         self.showWaitMsg("识别中.....")
 

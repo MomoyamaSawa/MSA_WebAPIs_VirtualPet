@@ -8,6 +8,7 @@ from PyQt6.QtCore import pyqtSignal,QObject
 from do.APIDto import *
 from common.weekdayType import WeekDayEnumArr
 from common.OptionType import OptionTypeEnum
+import os
 
 class PetApplication(QObject):
     getInfoFromImageSignal = pyqtSignal(str)
@@ -23,6 +24,8 @@ class PetApplication(QObject):
     wikiSignal = pyqtSignal(str)
     historyTodaySignal = pyqtSignal(str)
     musicListSignal = pyqtSignal(list)
+    badSignal = pyqtSignal()
+    restartSignal = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -88,7 +91,7 @@ class PetApplication(QObject):
         except Exception as e:
             self.exceptionSolve(e,OptionTypeEnum.HISTORY)
 
-    def getRandomMusic(self) -> (str,str):
+    def getRandomMusic(self):
         try:
             musicData = self.service.getRandomMusic()
             url = self.service.getMusicURL(musicData.id)
@@ -124,6 +127,9 @@ class PetApplication(QObject):
 
     def getInfoFromImage(self,filePath):
         try:
+            if not os.path.exists(filePath):
+                self.badSignal.emit()
+                return
             name,work = self.service.getInfoFromImage(filePath)
             self.getInfoFromImageSignal.emit(f"这是{work}的{name}")
             log = self.petService.writeInfoFromImageLog(filePath,name,work)
@@ -169,6 +175,7 @@ class PetApplication(QObject):
         err = type.value+": " + e.__class__.__name__ +" "+ str(e)
         print(cmdErrStr(err))
         self.petService.writeExceptionLog(err)
+        self.restartSignal.emit()
 
     def infoSolve(self,info):
         print(cmdInfoStr(info))

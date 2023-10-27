@@ -17,15 +17,6 @@ def checkDatabase():
         Session = sessionmaker(bind=engine)
         session = Session()
 
-        # # 定义数据模型
-        # Base = declarative_base()
-
-        # class MyTable(Base):
-        #     __tablename__ = 'test'
-        #     id = Column(Integer, primary_key=True)
-        #     column1 = Column(String)
-        #     column2 = Column(Integer)
-
         # 创建表格
         Base.metadata.create_all(engine)
 
@@ -39,11 +30,6 @@ def checkDatabase():
 
         session.add_all(datas)
         session.commit()
-
-        # # 查询数据
-        # query = session.query(MyTable).all()
-        # for data in query:
-        #     print(data.column1, data.column2)
 
         # 关闭会话
         session.close()

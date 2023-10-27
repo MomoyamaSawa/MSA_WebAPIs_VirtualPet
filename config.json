@@ -1,7 +1,7 @@
 {
     "MainWindow":{
-        "Weight":450,
-        "Height":800,
+        "Weight":425,
+        "Height":620,
         "Background":"rgb(247,247,247)"
     },
     "Panel":{
