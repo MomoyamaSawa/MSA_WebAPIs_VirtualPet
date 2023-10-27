@@ -6,7 +6,9 @@ from util.tools import cmdErrStr
 
 def main():
     app = QApplication(sys.argv)
-    w = MainWindow()
+    screen = app.primaryScreen()
+    scaleFactor = screen.devicePixelRatio()
+    w = MainWindow(scaleFactor)
     w.setWindowTitle("同济软院2023秋MSA课设多功能桌宠_2151641_王佳垚")
     w.show()
     w.initLive2d()

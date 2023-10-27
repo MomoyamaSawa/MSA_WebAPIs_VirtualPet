@@ -16,11 +16,12 @@ class MainWindow(QWidget):
     """
     桌宠程序的主操作界面
     """
-    def __init__(self):
+    def __init__(self,factor):
         super().__init__()
         self.config = GlobalConfig()
-        self.resize(self.config.MainWindow["Weight"], self.config.MainWindow["Height"])
+        self.resize(self.config.MainWindow["Weight"]/factor, self.config.MainWindow["Height"]/factor)
         self.hboxLayout = QHBoxLayout(self)
+        self.screenFactor = factor
 
         self.app = PetApplication()
         self.threadPool = QThreadPool()
@@ -114,14 +115,10 @@ class MainWindow(QWidget):
     def updateFrom(self):
         if self.dll is not None and isOK(self.dll):
             x, y = getPos(self.dll)
-            newX = x - self.width() // 2
-            newY = y - self.height() // 2
-            pos = self.mapFromGlobal(QPoint(newX, newY))
-            # self.move(0,40)
-            self.move(x - self.width() // 2, y - self.height() // 2 - 100)
-            g = self.geometry()
-            t = g.x()
-            b = g.y()
+            # 逻辑位置和像素位置转换7
+            newX = x / self.screenFactor
+            newY = y / self.screenFactor
+            self.move(newX - self.width() // 2, newY - self.height() // 2 - 100)
             if isLeftTouched(self.dll) and self.isLeftTapOK:
                 # 下面两句话顺序有要求
                 self.setLeftTapOK(False)
