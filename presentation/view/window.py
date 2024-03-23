@@ -1,25 +1,39 @@
-from PyQt6.QtMultimedia import QMediaPlayer,QAudioOutput
+from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from util.config import GlobalConfig
-from qfluentwidgets import PushButton,Action,TeachingTip,TeachingTipView,TeachingTipTailPosition,CommandBarView,Flyout,FlyoutAnimationType
+from qfluentwidgets import (
+    PushButton,
+    Action,
+    TeachingTip,
+    TeachingTipView,
+    TeachingTipTailPosition,
+    CommandBarView,
+    Flyout,
+    FlyoutAnimationType,
+)
 from qfluentwidgets import FluentIcon as FIF
 from application.PetApp import PetApplication
 from presentation.component.fromBox import *
 from presentation.component.dialogBox import CharacterDialogBox
-import shutil,random
+import shutil, random
 from util.live2D import *
 from common.AIDrawType import *
 from common.LanguageType import *
 from util.showCon import *
 from util.tools import *
 
+
 class MainWindow(QWidget):
     """
     桌宠程序的主操作界面
     """
-    def __init__(self,factor):
+
+    def __init__(self, factor):
         super().__init__()
         self.config = GlobalConfig()
-        self.resize(self.config.MainWindow["Weight"]/factor, self.config.MainWindow["Height"]/factor)
+        self.resize(
+            self.config.MainWindow["Weight"] / factor,
+            self.config.MainWindow["Height"] / factor,
+        )
         self.hboxLayout = QHBoxLayout(self)
         self.screenFactor = factor
 
@@ -30,10 +44,12 @@ class MainWindow(QWidget):
         self.audioOutput.setVolume(50)
         self.player = QMediaPlayer()
         self.player.setAudioOutput(self.audioOutput)
-        self.player.playbackStateChanged.connect(lambda :self._closeOptionTip(self.player.playbackState()))
+        self.player.playbackStateChanged.connect(
+            lambda: self._closeOptionTip(self.player.playbackState())
+        )
         self.musicTip = None
 
-        self.dialog = CharacterDialogBox(self,GlobalConfig().PetName)
+        self.dialog = CharacterDialogBox(self, GlobalConfig().PetName)
         self.dialog.hide()
         self.dialog.stopLoopSignal.connect(self.stopLoopMsg)
         self.frombox = None
@@ -46,12 +62,14 @@ class MainWindow(QWidget):
 
         self.isLeftTapOK = True
         self.leftTapTimer = QTimer(self)
-        self.leftTapTimer.timeout.connect(lambda :self.setLeftTapOK(True))
+        self.leftTapTimer.timeout.connect(lambda: self.setLeftTapOK(True))
         self.leftTapTimer.setInterval(10000)
         self.leftTapTimer.setSingleShot(True)
 
         # 隐藏边框
-        self.setWindowFlag(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
+        self.setWindowFlag(
+            Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint
+        )
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
         self._initQss()
@@ -87,7 +105,7 @@ class MainWindow(QWidget):
         self.dialog.deleteEvent()
         self.stopMusic()
         self.deleteLater()
-        new = MainWindow()
+        new = MainWindow(self.screenFactor)
         new.setGeometry(geometry)
         new.dll = dll
         new.dllThread = dllThread
@@ -97,7 +115,7 @@ class MainWindow(QWidget):
         self.setLayout(self.hboxLayout)
         self.hboxLayout.addWidget(self.dialog, 0, Qt.AlignmentFlag.AlignTop)
 
-    def setLeftTapOK(self,flag):
+    def setLeftTapOK(self, flag):
         self.isLeftTapOK = flag
         if not flag:
             self.leftTapTimer.stop()
@@ -110,7 +128,7 @@ class MainWindow(QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
         globalPosition = self.geometry().center()
-        self.dll,self.dllThread = createLive2D(globalPosition.x(),globalPosition.y())
+        self.dll, self.dllThread = createLive2D(globalPosition.x(), globalPosition.y())
 
     def updateFrom(self):
         if self.dll is not None and isOK(self.dll):
@@ -127,15 +145,17 @@ class MainWindow(QWidget):
                 self.rightTap()
 
     def _initQss(self):
-        self.setStyleSheet(f"""
+        self.setStyleSheet(
+            f"""
             MainWindow {{
                 background: {self.config.MainWindow['Background']};
             }}
-        """)
+        """
+        )
 
     def leftTap(self):
         randomNumber = random.random()
-        if randomNumber < 0.8 :
+        if randomNumber < 0.8:
             f = FunctionRunnable(self.app.getSingle)
             self.threadPool.start(f)
         else:
@@ -148,39 +168,39 @@ class MainWindow(QWidget):
         """
         view = CommandBarView(self)
 
-        gpt = Action(FIF.MESSAGE, 'GPT猫娘')
+        gpt = Action(FIF.MESSAGE, "GPT猫娘")
         view.addAction(gpt)
         gpt.triggered.connect(self.gpt)
 
-        music = Action(FIF.MUSIC, '播放音乐')
+        music = Action(FIF.MUSIC, "播放音乐")
         view.addAction(music)
         music.triggered.connect(self.getMusic)
 
-        randomMusic = Action(FIF.CALORIES, '随机二次元音乐')
+        randomMusic = Action(FIF.CALORIES, "随机二次元音乐")
         view.addAction(randomMusic)
         randomMusic.triggered.connect(self.randomMusic)
 
-        pic = Action(FIF.PALETTE, '随机图片')
+        pic = Action(FIF.PALETTE, "随机图片")
         view.addAction(pic)
         pic.triggered.connect(self.showRandomPic)
 
-        search = Action(FIF.SEARCH_MIRROR, '二次元识别')
+        search = Action(FIF.SEARCH_MIRROR, "二次元识别")
         view.addAction(search)
         search.triggered.connect(self.search)
 
-        draw = Action(FIF.PENCIL_INK, 'AI绘画')
+        draw = Action(FIF.PENCIL_INK, "AI绘画")
         view.addAction(draw)
         draw.triggered.connect(self.draw)
 
-        tr = Action(FIF.LANGUAGE, '翻译')
+        tr = Action(FIF.LANGUAGE, "翻译")
         view.addAction(tr)
         tr.triggered.connect(self.tr)
 
-        wiki = Action(FIF.BOOK_SHELF, '维基百科')
+        wiki = Action(FIF.BOOK_SHELF, "维基百科")
         view.addAction(wiki)
         wiki.triggered.connect(self.searchWiki)
 
-        history = Action(FIF.HISTORY, '历史上今天的事')
+        history = Action(FIF.HISTORY, "历史上今天的事")
         view.addAction(history)
         history.triggered.connect(self.showHistoryOntoday)
 
@@ -189,18 +209,18 @@ class MainWindow(QWidget):
         # stopMusic.triggered.connect(self.stopMusic)
 
         # view.addHiddenAction(Action(FIF.SETTING, '设置'))
-        restart = Action(FIF.ROTATE, '重启UI')
+        restart = Action(FIF.ROTATE, "重启UI")
         view.addHiddenAction(restart)
         restart.triggered.connect(self.restart)
 
-        closeAction = Action(FIF.CLOSE, '关闭桌宠')
+        closeAction = Action(FIF.CLOSE, "关闭桌宠")
         closeAction.triggered.connect(lambda: self.onClose())
         view.addHiddenAction(closeAction)
         view.resizeToSuitableWidth()
 
         left = self.geometry().left()
         h = self.geometry().height()
-        pos = QPoint(left, self.geometry().bottom()-50)
+        pos = QPoint(left, self.geometry().bottom() - 50)
         Flyout.make(view, pos, self, FlyoutAnimationType.FADE_IN)
 
     def onClose(self):
@@ -209,37 +229,43 @@ class MainWindow(QWidget):
         self.close()
 
     def draw(self):
-        frombox = self.showFromBox("AI绘画","请输入图片关键字",[AIOptionsStyle,AIOptionsRatio])
+        frombox = self.showFromBox(
+            "AI绘画", "请输入图片关键字", [AIOptionsStyle, AIOptionsRatio]
+        )
         frombox.fromContentSignal.connect(self._draw)
 
-    @pyqtSlot(str,list)
-    def _draw(self,content,index):
-        f = FunctionRunnable(self.app.drawAI,content,AIOptionsStyle[index[0]],AIOptionsRatio[index[1]])
+    @pyqtSlot(str, list)
+    def _draw(self, content, index):
+        f = FunctionRunnable(
+            self.app.drawAI, content, AIOptionsStyle[index[0]], AIOptionsRatio[index[1]]
+        )
         self.threadPool.start(f)
         self.showWaitMsg("绘画中.....")
 
     def gpt(self):
-        frombox = self.showFromBox("GPT猫娘","请输入对话内容")
+        frombox = self.showFromBox("GPT猫娘", "请输入对话内容")
         frombox.fromContentSignal.connect(self._gpt)
 
     @pyqtSlot(str)
-    def _gpt(self,content):
-        f = FunctionRunnable(self.app.getGPT,content)
+    def _gpt(self, content):
+        f = FunctionRunnable(self.app.getGPT, content)
         self.threadPool.start(f)
         self.showWaitMsg("思考中.....")
 
-    def showFromBox(self,title,content,options=None):
-        self.frombox = FromBox(title,content,options)
+    def showFromBox(self, title, content, options=None):
+        self.frombox = FromBox(title, content, options)
         self.stateMa.setState(FromBoxState(self.frombox))
         return self.frombox
 
-    def showFromSelectBox(self,title,indexs,values):
-        self.frombox = FromSelectBox(title,indexs,values)
+    def showFromSelectBox(self, title, indexs, values):
+        self.frombox = FromSelectBox(title, indexs, values)
         self.stateMa.setState(FromBoxState(self.frombox))
         return self.frombox
 
-    def viewLayAddShowW(self,view):
-        self.hboxLayout.addWidget(view,0,Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignCenter)
+    def viewLayAddShowW(self, view):
+        self.hboxLayout.addWidget(
+            view, 0, Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignCenter
+        )
 
     def randomMusic(self):
         f = FunctionRunnable(self.app.getRandomMusic)
@@ -251,24 +277,26 @@ class MainWindow(QWidget):
         self.player.setSource(QUrl())
         self.player.stop()
 
-    def _randomMusic(self,title,author):
+    def _randomMusic(self, title, author):
         self._playMusicFromFile(f"正在播放：{title}，作者：{author}")
         # self.showMainMsg(f"正在播放：{title}，作者：{author}")
         # self.showOptionTip("音乐播放中~",f"正在播放：{title}，作者：{author}")
 
     def search(self):
         # 打开文件选择对话框
-        file, _ = QFileDialog.getOpenFileName(self, "选择图片文件", "", "Image Files (*.png *.jpg)")
-        f = FunctionRunnable(self.app.getInfoFromImage,file)
+        file, _ = QFileDialog.getOpenFileName(
+            self, "选择图片文件", "", "Image Files (*.png *.jpg)"
+        )
+        f = FunctionRunnable(self.app.getInfoFromImage, file)
         # f = self.app.getInfoFromImage(file)
         self.threadPool.start(f)
         self.showWaitMsg("识别中.....")
 
-    def showMsg(self,msg):
+    def showMsg(self, msg):
         self.stateMa.setState(DialogState(self.dialog))
         self.dialog.printDialog(msg)
 
-    def showMainMsg(self,msg):
+    def showMainMsg(self, msg):
         self.showMsg(msg)
         # 下面两句话的先后顺序有要求
         self.setLeftTapOK(False)
@@ -280,19 +308,21 @@ class MainWindow(QWidget):
         self.dialog.hideSignal.disconnect(self._setHideSlot)
         self.setLeftTapOK(True)
 
-    def showWaitMsg(self,text):
+    def showWaitMsg(self, text):
         self.stateMa.setState(DialogState(self.dialog))
-        self.dialog.printLoopDialog(GlobalConfig().PetName + text,GlobalConfig().Timeout)
+        self.dialog.printLoopDialog(
+            GlobalConfig().PetName + text, GlobalConfig().Timeout
+        )
         self.setLeftTapOK(False)
         self.leftTapTimer.stop()
 
     def tr(self):
-        frombox = self.showFromBox("翻译","请输入要翻译的文本",[languageOptions])
+        frombox = self.showFromBox("翻译", "请输入要翻译的文本", [languageOptions])
         frombox.fromContentSignal.connect(self._tr)
 
-    def _tr(self,keyword,index):
+    def _tr(self, keyword, index):
         # 去除“To ”
-        f = FunctionRunnable(self.app.getTr,keyword,languageOptions[index[0]][3:])
+        f = FunctionRunnable(self.app.getTr, keyword, languageOptions[index[0]][3:])
         self.threadPool.start(f)
         self.showWaitMsg("翻译中.....")
 
@@ -306,25 +336,25 @@ class MainWindow(QWidget):
         self.showWaitMsg("挑选中.....")
 
     def searchWiki(self):
-        frombox = self.showFromBox("wiki","请输入关键字")
+        frombox = self.showFromBox("wiki", "请输入关键字")
         frombox.fromContentSignal.connect(self._searchWiki)
 
-    def _searchWiki(self,keyword):
-        f = FunctionRunnable(self.app.searchWiki,keyword)
+    def _searchWiki(self, keyword):
+        f = FunctionRunnable(self.app.searchWiki, keyword)
         self.threadPool.start(f)
         self.showWaitMsg("查询中.....")
 
-    def showWiki(self,contents):
+    def showWiki(self, contents):
         indexs = []
         values = []
         for item in contents:
             indexs.append(str(item.pageid))
             values.append(item.title)
-        frombox = self.showFromSelectBox("选择条目",indexs,values)
+        frombox = self.showFromSelectBox("选择条目", indexs, values)
         frombox.fromSelectSignal.connect(self._showWiki)
 
-    def _showWiki(self,id):
-        f = FunctionRunnable(self.app.getWikiDetail,id)
+    def _showWiki(self, id):
+        f = FunctionRunnable(self.app.getWikiDetail, id)
         self.threadPool.start(f)
         self.showWaitMsg("查询中.....")
 
@@ -332,7 +362,7 @@ class MainWindow(QWidget):
         position = TeachingTipTailPosition.RIGHT
         view = TeachingTipView(
             icon=None,
-            title='𝓖𝓪𝓵𝓵𝓪𝓻𝔂',
+            title="𝓖𝓪𝓵𝓵𝓪𝓻𝔂",
             content="𝑨𝒓𝒕 𝒊𝒔 𝒕𝒉𝒆 𝒍𝒊𝒆 𝒕𝒉𝒂𝒕 𝒆𝒏𝒂𝒃𝒍𝒆𝒔 𝒖𝒔 𝒕𝒐 𝒓𝒆𝒂𝒍𝒊𝒛𝒆 𝒕𝒉𝒆 𝒕𝒓𝒖𝒕𝒉.",
             image=GlobalConfig().TempPic,
             isClosable=True,
@@ -340,16 +370,19 @@ class MainWindow(QWidget):
         )
 
         # add widget to view
-        button = PushButton('下载到本地')
-        button.clicked.connect(lambda :self.downloadToLocal(GlobalConfig().TempPic,type="jpg"))
+        button = PushButton("下载到本地")
+        button.clicked.connect(
+            lambda: self.downloadToLocal(GlobalConfig().TempPic, type="jpg")
+        )
         button.setFixedWidth(120)
         view.addWidget(button, align=Qt.AlignmentFlag.AlignRight)
 
         tip = TeachingTip.make(
-            view, target=self, duration=-1, tailPosition=position, parent=self)
+            view, target=self, duration=-1, tailPosition=position, parent=self
+        )
         view.closed.connect(tip.close)
 
-    def showOptionTip(self,title,content):
+    def showOptionTip(self, title, content):
         position = TeachingTipTailPosition.RIGHT
         view = TeachingTipView(
             icon=None,
@@ -361,20 +394,23 @@ class MainWindow(QWidget):
         )
 
         # add widget to view
-        button = PushButton('停止')
+        button = PushButton("停止")
         button.clicked.connect(self.stopMusic)
         button.clicked.connect(view.close)
         button.setFixedWidth(120)
         view.addWidget(button, align=Qt.AlignmentFlag.AlignRight)
 
         tip = TeachingTip.make(
-            view, target=self, duration=-1, tailPosition=position, parent=self)
+            view, target=self, duration=-1, tailPosition=position, parent=self
+        )
         view.closed.connect(tip.close)
         self.musicTip = tip
 
-    def downloadToLocal(self,filePath,type):
+    def downloadToLocal(self, filePath, type):
         # 打开文件对话框，选择保存路径和文件名
-        savePath, _ = QFileDialog.getSaveFileName(self, "保存文件", "", f"{type} Files (*.{type})")
+        savePath, _ = QFileDialog.getSaveFileName(
+            self, "保存文件", "", f"{type} Files (*.{type})"
+        )
         if savePath:
             try:
                 # 复制源数据文件到选择的保存路径
@@ -390,34 +426,34 @@ class MainWindow(QWidget):
         frombox.fromContentSignal.connect(self.selectMusic)
 
     @pyqtSlot(str)
-    def selectMusic(self,keyword):
-        f = FunctionRunnable(self.app.getMusicList,keyword)
+    def selectMusic(self, keyword):
+        f = FunctionRunnable(self.app.getMusicList, keyword)
         self.threadPool.start(f)
         self.showWaitMsg("查询中.....")
 
-    def _selectMusic(self,items):
+    def _selectMusic(self, items):
         indexs = []
         values = []
         for item in items:
             indexs.append(str(item.id))
             values.append(item.name + " - " + item.author)
-        frombox = self.showFromSelectBox("选择音乐",indexs,values)
+        frombox = self.showFromSelectBox("选择音乐", indexs, values)
         frombox.fromSelectSignal.connect(self._playMusic)
 
-    @pyqtSlot(str,str)
-    def _playMusic(self,id,content):
+    @pyqtSlot(str, str)
+    def _playMusic(self, id, content):
         self.stopMusic()
-        f = FunctionRunnable(self.app.getMusicToFile,id,content)
+        f = FunctionRunnable(self.app.getMusicToFile, id, content)
         self.threadPool.start(f)
         self.showWaitMsg("查询中.....")
 
     @pyqtSlot(str)
-    def _playMusicFromFile(self,content = ""):
+    def _playMusicFromFile(self, content=""):
         self.player.setSource(QUrl.fromLocalFile(GlobalConfig().TempMusic))
         self.player.play()
-        self.showOptionTip("音乐播放中~",content)
+        self.showOptionTip("音乐播放中~", content)
 
-    def _closeOptionTip(self,state):
+    def _closeOptionTip(self, state):
         if state == QMediaPlayer.PlaybackState.StoppedState and self.musicTip:
             self.musicTip.close()
 

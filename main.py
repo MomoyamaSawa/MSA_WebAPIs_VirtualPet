@@ -4,6 +4,7 @@ from presentation.view.window import MainWindow
 from util.databaseCreate import checkDatabase
 from util.tools import cmdErrStr
 
+
 def main():
     app = QApplication(sys.argv)
     screen = app.primaryScreen()
@@ -15,6 +16,7 @@ def main():
     checkDatabase()
 
     app.exec()
+
 
 if __name__ == "__main__":
     try:

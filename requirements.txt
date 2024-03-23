@@ -1,3 +1,6 @@
 httpx==0.25.0
 PyQt6==6.5.0
+PyQt6-Qt6==6.5.0
 SQLAlchemy==1.4.39
+pywin32==225
+PyQt6-Fluent-Widgets
