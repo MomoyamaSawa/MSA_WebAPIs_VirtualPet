@@ -7,6 +7,7 @@ from common.AIDrawType import *
 from common.hitohotoType import HitokotoTypeEnum
 from datetime import datetime
 from do.PetDto import *
+import winreg
 
 class APIService:
     """
@@ -14,6 +15,33 @@ class APIService:
     """
     def __init__(self):
         self.config = GlobalConfig()
+        self.proxies = self.get_windows_proxy()
+
+    def get_windows_proxy(self):
+        try:
+            internet_settings = winreg.OpenKey(
+                winreg.HKEY_CURRENT_USER,
+                r"Software\Microsoft\Windows\CurrentVersion\Internet Settings",
+            )
+            proxy_enabled = winreg.QueryValueEx(internet_settings, "ProxyEnable")[0]
+            if proxy_enabled:
+                proxy_server = winreg.QueryValueEx(internet_settings, "ProxyServer")[0]
+                proxies = {}
+                if "=" in proxy_server:
+                    # Different proxy for different protocols
+                    for part in proxy_server.split(";"):
+                        protocol, address = part.split("=")
+                        proxies[protocol] = f"{protocol}://{address}"
+                else:
+                    # Same proxy for all protocols
+                    proxies["http://"] = f"http://{proxy_server}"
+                    proxies["https://"] = f"http://{proxy_server}"
+                return proxies
+            else:
+                return None
+        except Exception as e:
+            print(f"Error accessing registry: {e}")
+            return None
 
     def getTime(self) -> TimeDto:
         """
@@ -29,7 +57,7 @@ class APIService:
         """
         url = GlobalConfig().WebAPI["GetWeather"]["URL"]
         params =  GlobalConfig().WebAPI["GetWeather"]["Params"]
-        with httpx.Client() as client:
+        with httpx.Client(proxies=self.proxies) as client:
             response = client.get(url, params=params,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
@@ -44,7 +72,7 @@ class APIService:
         searchURL = self.config.WebAPI["Music"]["Search"]["URL"]
         searchParams = self.config.WebAPI["Music"]["Search"]["Params"]
         searchParams['keywords'] = keyword
-        with httpx.Client() as client:
+        with httpx.Client(proxies=self.proxies) as client:
             response = client.get(searchURL, params=searchParams,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
@@ -54,7 +82,7 @@ class APIService:
         searchURL = GlobalConfig().WebAPI["Music"]["Search"]["URL"]
         searchParams = GlobalConfig().WebAPI["Music"]["Search"]["Params"]
         searchParams['keywords'] = keyword
-        with httpx.Client() as client:
+        with httpx.Client(proxies=self.proxies) as client:
             response = client.get(searchURL, params=searchParams,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
@@ -67,7 +95,7 @@ class APIService:
         getURL =  GlobalConfig().WebAPI["Music"]["Get"]["URL"]
         getParams =  GlobalConfig().WebAPI["Music"]["Get"]["Params"]
         getParams['id'] = id
-        with httpx.Client() as client:
+        with httpx.Client(proxies=self.proxies) as client:
             response = client.get(getURL, params=getParams,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
@@ -79,7 +107,7 @@ class APIService:
         获得随机图片的数据
         """
         url = self.config.WebAPI["Picture"]["URL"]
-        with httpx.Client() as client:
+        with httpx.Client(proxies=self.proxies) as client:
             response = client.get(url,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         return url,response.content
@@ -93,7 +121,7 @@ class APIService:
         value = random.sample(list(HitokotoTypeEnum), 1)
         # 随机来一个分类
         params = {'c': value[0].value}
-        with httpx.Client() as client:
+        with httpx.Client(proxies=self.proxies) as client:
             response = client.get(url, params=params,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
@@ -142,7 +170,7 @@ class APIService:
         获得历史上的今天
         """
         url = self.config.WebAPI["History"]["URL"]
-        with httpx.Client() as client:
+        with httpx.Client(proxies=self.proxies) as client:
             response = client.get(url,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
@@ -159,7 +187,7 @@ class APIService:
         url = self.config.WebAPI["InfoFromImage"]["URL"]
         files = {'image': open(filePath, 'rb')}
         params = self.config.WebAPI["InfoFromImage"]["Params"]
-        with httpx.Client() as client:
+        with httpx.Client(proxies=self.proxies) as client:
             # only httpx 不知道为什么用request防火墙会拦
             response = client.post(url, files=files, params=params,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
@@ -173,7 +201,7 @@ class APIService:
         """
         url = self.config.WebAPI["Music"]["Random"]["URL"]
         params = self.config.WebAPI["Music"]["Random"]["Params"]
-        with httpx.Client() as client:
+        with httpx.Client(proxies=self.proxies) as client:
             response = client.get(url, params=params,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
@@ -188,7 +216,7 @@ class APIService:
         params = self.config.WebAPI["Translation"]["Params"]
         params['msg'] = msg
         params['to'] = to.value
-        with httpx.Client() as client:
+        with httpx.Client(proxies=self.proxies) as client:
             response = client.get(url, params=params,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
@@ -202,9 +230,13 @@ class APIService:
         params = self.config.WebAPI["Wiki"]["Params"]
         params.update(self.config.WebAPI["Wiki"]["SearchParams"])
         params['srsearch'] = keyword
-        with httpx.Client() as client:
+        # 打印最终访问的URL
+        full_url = httpx.URL(url, params=params)
+        print(f"Final URL: {full_url}")
+        with httpx.Client(proxies=self.proxies) as client:
             response = client.get(url, params=params,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
+            print(f"Response: {response}")
         data = response.json()
         results = []
         for item in data['query']['search']:
@@ -219,7 +251,7 @@ class APIService:
         params = self.config.WebAPI["Wiki"]["Params"]
         params.update(self.config.WebAPI["Wiki"]["GetParams"])
         params['pageids'] = id
-        with httpx.Client() as client:
+        with httpx.Client(proxies=self.proxies) as client:
             response = client.get(url, params=params,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
@@ -252,7 +284,7 @@ class APIService:
         }
         params['messages'].append(now)
         headers = GlobalConfig().WebAPI["GPT"]["Headers"]
-        with httpx.Client() as client:
+        with httpx.Client(proxies=self.proxies) as client:
             response = client.post(url, data=json.dumps(params),headers=headers,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
@@ -267,7 +299,7 @@ class APIService:
         params['imgTxt'] = txt
         params['style'] = style.value
         params['ratio'] = radio.value
-        with httpx.Client() as client:
+        with httpx.Client(proxies=self.proxies) as client:
             response = client.post(url, data=params,timeout=GlobalConfig().Timeout)
             response.raise_for_status()
         data = response.json()
