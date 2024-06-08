@@ -1,131 +1,131 @@
 {
-    "MainWindow":{
-        "Weight":425,
-        "Height":620,
-        "Background":"rgb(247,247,247)"
+    "MainWindow": {
+        "Weight": 425,
+        "Height": 620,
+        "Background": "rgb(247,247,247)"
     },
-    "Panel":{
-        "Width":400,
-        "Background":"white",
-        "Border":"1px solid lightgray",
-        "BorderRadius":"20px"
+    "Panel": {
+        "Width": 400,
+        "Background": "white",
+        "Border": "1px solid lightgray",
+        "BorderRadius": "20px"
     },
-    "WebAPI":{
-        "GetWeather":{
-            "URL":"https://restapi.amap.com/v3/weather/weatherInfo",
-            "Params":{
-                "key":"db0aa153c808a319ff5146ac3116cef1",
-                "city":"310114",
-                "extensions":"base",
-                "output":"JSON"
+    "WebAPI": {
+        "GetWeather": {
+            "URL": "https://restapi.amap.com/v3/weather/weatherInfo",
+            "Params": {
+                "key": "db0aa153c808a319ff5146ac3116cef1",
+                "city": "310114",
+                "extensions": "base",
+                "output": "JSON"
             }
         },
-        "Music":{
-            "Search":{
-                "URL":"https://autumnfish.cn/cloudsearch",
-                "Params":{
-                    "limit":4,
-                    "type":1
+        "Music": {
+            "Search": {
+                "URL": "https://autumnfish.cn/cloudsearch",
+                "Params": {
+                    "limit": 4,
+                    "type": 1
                 }
             },
-            "Get":{
-                "URL":"https://autumnfish.cn/song/url/v1",
-                "Params":{
-                    "level":"standard"
+            "Get": {
+                "URL": "https://autumnfish.cn/song/url/v1",
+                "Params": {
+                    "level": "standard"
                 }
             },
-            "Random":{
-                "URL":"https://api.paugram.com/acgm/",
-                "Params":{
-                    "list":1
-                }
-            }
-        },
-        "Picture":{
-            "URL":"https://t.mwm.moe/pc/"
-        },
-        "Sentance":{
-            "URL":"https://v1.hitokoto.cn/"
-        },
-        "Image":{
-            "Ranking":{
-                "URL":"https://api.acgmx.com/public/ranking",
-                "Params":{
-                    "page":1,
-                    "per_page":5
-                }
-            },
-            "Get":{
-                "URL":"https://api.acgmx.com/illusts/urlLook",
-                "Params":{
-                    "cache":"false"
+            "Random": {
+                "URL": "https://api.paugram.com/acgm/",
+                "Params": {
+                    "list": 1
                 }
             }
         },
-        "History":{
-            "URL":"https://api.oick.cn/lishi/api.php"
+        "Picture": {
+            "URL": "https://t.mwm.moe/pc/"
         },
-        "InfoFromImage":{
-            "URL":"https://aiapiv2.animedb.cn/ai/api/detect",
-            "Params":{
+        "Sentance": {
+            "URL": "https://v1.hitokoto.cn/"
+        },
+        "Image": {
+            "Ranking": {
+                "URL": "https://api.acgmx.com/public/ranking",
+                "Params": {
+                    "page": 1,
+                    "per_page": 5
+                }
+            },
+            "Get": {
+                "URL": "https://api.acgmx.com/illusts/urlLook",
+                "Params": {
+                    "cache": "false"
+                }
+            }
+        },
+        "History": {
+            "URL": "https://api.oick.cn/lishi/api.php"
+        },
+        "InfoFromImage": {
+            "URL": "https://aiapiv2.animedb.cn/ai/api/detect",
+            "Params": {
                 "force_one": 0,
                 "model": "anime_model_lovelive",
                 "ai_detect": 0
             }
         },
-        "Translation":{
-            "URL":"https://xiaoapi.cn/API/zs_fy.php",
-            "Params":{
-                "type":"youdao"
+        "Translation": {
+            "URL": "http://xiaoapi.cn/API/zs_fy.php",
+            "Params": {
+                "type": "youdao"
             }
         },
-        "Wiki":{
-            "URL":"https://zh.wikipedia.org/w/api.php?",
-            "WikiURL":"https://zh.wikipedia.org/wiki",
-            "Params":{
-                "action":"query",
-                "format":"json"
+        "Wiki": {
+            "URL": "https://zh.wikipedia.org/w/api.php?",
+            "WikiURL": "https://zh.wikipedia.org/wiki",
+            "Params": {
+                "action": "query",
+                "format": "json"
             },
-            "SearchParams":{
-                "list":"search",
-                "srlimit":5
+            "SearchParams": {
+                "list": "search",
+                "srlimit": 5
             },
-            "GetParams":{
-                "prop":"extracts",
-                "exintro":"",
-                "explaintext":""
+            "GetParams": {
+                "prop": "extracts",
+                "exintro": "",
+                "explaintext": ""
             }
         },
-        "GPT":{
-            "Headers":{
-                "Content-Type":"application/json",
-                "Authorization":"Bearer sk-6HEru99826ehc6aLBAoObeB2O1Uz84FKiMzibcKaMYgHU6Hp"
+        "GPT": {
+            "Headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer sk-6HEru99826ehc6aLBAoObeB2O1Uz84FKiMzibcKaMYgHU6Hp"
             },
-            "URL":"https://api.chatanywhere.com.cn/v1/chat/completions",
-            "Data":{
-                "model":"gpt-3.5-turbo",
-                "temperature":0.8
+            "URL": "https://api.chatanywhere.com.cn/v1/chat/completions",
+            "Data": {
+                "model": "gpt-3.5-turbo",
+                "temperature": 0.8
             },
-            "SysRole":{
-                "role":"system",
-                "content":"你现在是一只可爱的二次元猫娘，你之后的回答应该尽可能可爱，比如加上喵之类的后缀，你之后的回答应该像一只可爱的猫娘"
+            "SysRole": {
+                "role": "system",
+                "content": "你现在是一只可爱的二次元猫娘，你之后的回答应该尽可能可爱，比如加上喵之类的后缀，你之后的回答应该像一只可爱的猫娘"
             },
-            "Num":5
+            "Num": 5
         },
-        "AIDraw":{
-            "URL":"https://luckycola.com.cn/aiImg/getAiImage",
-            "Params":{
-                "appKey":"652bf8c6e95421d67849ab56",
-                "uid":"7SZQJJ1697380550326EWYF3yfxGI"
+        "AIDraw": {
+            "URL": "https://luckycola.com.cn/aiImg/getAiImage",
+            "Params": {
+                "appKey": "652bf8c6e95421d67849ab56",
+                "uid": "7SZQJJ1697380550326EWYF3yfxGI"
             }
         }
     },
-    "Database":"sqlite:///data.db",
-    "Storage":"./storage/",
-    "TempMusic":"./resource/temp/TempMusic",
-    "TempPic":"./resource/temp/TempPic",
-    "InfoPic":"./resource/test.jpg",
-    "PetName":"寧々",
-    "Live2dPath":"./resource/live2d.dll",
-    "Timeout":60
+    "Database": "sqlite:///data.db",
+    "Storage": "./storage/",
+    "TempMusic": "./resource/temp/TempMusic",
+    "TempPic": "./resource/temp/TempPic",
+    "InfoPic": "./resource/test.jpg",
+    "PetName": "寧々",
+    "Live2dPath": "./resource/live2d.dll",
+    "Timeout": 60
 }
