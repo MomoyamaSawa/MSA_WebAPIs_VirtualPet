@@ -64,12 +64,21 @@ class PetApplication(QObject):
 
     def searchWiki(self,keyword):
         try:
+            if not self._checkKeyword(keyword):
+                return
             contents = self.service.getWikiSearch(keyword)
             self.searchWikiSignal.emit(contents.contents)
             info = self.petService.writeWikiSearchLog(keyword)
             self.infoSolve(info)
         except Exception as e:
             self.exceptionSolve(e,OptionTypeEnum.WIKI)
+
+    def _checkKeyword(self, keyword):
+        keyword = keyword.strip()  # 删除两端的空格
+        if not keyword or len(keyword) > 20:
+            self.gptSignal.emit("关键词非法，宁宁不知道哦qwq")
+            return False
+        return True
 
     def getWikiDetail(self,id):
         try:

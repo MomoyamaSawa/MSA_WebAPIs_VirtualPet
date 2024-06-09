@@ -127,6 +127,7 @@ class APIService:
         data = response.json()
         return SentanceDataDto(data['from'], data['from_who'], data['hitokoto'])
 
+    # region
     # def getSearchImages(self,type:RankingImgType,mode:RankingImgMode):
     #     """
     #     获得搜索图片
@@ -164,6 +165,7 @@ class APIService:
     #         results.append(result)
 
     #     return SearchImagesDto(results,nextPage)
+    # endregion
 
     def getHistoryOnToday(self) -> HistoryOnTodayDto:
         """
